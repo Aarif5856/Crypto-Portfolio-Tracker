@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>White-Label Crypto Portfolio Tracker - Client Examples</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .client-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .client-card {
+            background: white;
+            color: #333;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .client-card:hover {
+            transform: translateY(-5px);
+        }
+        .client-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+        }
+        .coinvision { background: #00C2FF; }
+        .cryptopro { background: #10B981; }
+        .bittracker { background: #F59E0B; }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 15px;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        .features {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+        }
+        .features h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .features ul {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+        .features li {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .cta {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 White-Label Crypto Portfolio Tracker</h1>
+            <p>See how 3 different clients use our system with custom branding</p>
+        </div>
+
+        <div class="client-grid">
+            <div class="client-card">
+                <div class="client-logo coinvision">C</div>
+                <h3>CoinVision</h3>
+                <p>Professional crypto portfolio tracker with blue branding</p>
+                <p><strong>Features:</strong> Wallet connection, real-time prices, portfolio tracking</p>
+                <a href="https://coinvision.vercel.app" target="_blank" class="btn">View Live Demo</a>
+            </div>
+
+            <div class="client-card">
+                <div class="client-logo cryptopro">C</div>
+                <h3>CryptoPro</h3>
+                <p>Advanced portfolio management with green branding</p>
+                <p><strong>Features:</strong> Risk analysis, Pro upgrades, mobile responsive</p>
+                <a href="https://cryptopro.vercel.app" target="_blank" class="btn">View Live Demo</a>
+            </div>
+
+            <div class="client-card">
+                <div class="client-logo bittracker">B</div>
+                <h3>BitTracker</h3>
+                <p>Bitcoin-focused tracker with orange branding</p>
+                <p><strong>Features:</strong> Top movers, watchlist, analytics</p>
+                <a href="https://bittracker.vercel.app" target="_blank" class="btn">View Live Demo</a>
+            </div>
+        </div>
+
+        <div class="features">
+            <h3>🎯 What Each Client Gets:</h3>
+            <ul>
+                <li>✅ Custom branding & colors</li>
+                <li>✅ Wallet connection (MetaMask)</li>
+                <li>✅ Real-time crypto prices</li>
+                <li>✅ Portfolio tracking</li>
+                <li>✅ Risk analysis</li>
+                <li>✅ Pro upgrade system</li>
+                <li>✅ Mobile responsive design</li>
+                <li>✅ Automated deployment</li>
+                <li>✅ Complete source code</li>
+                <li>✅ 30-day support included</li>
+            </ul>
+        </div>
+
+        <div class="cta">
+            <h2>💰 Ready to Start Your White-Label Business?</h2>
+            <p>Get the complete system with automation scripts, documentation, and support</p>
+            <a href="https://github.com/Aarif5856/Crypto-Portfolio-Tracker" target="_blank" class="btn">View Source Code</a>
+            <a href="mailto:your-email@example.com" class="btn">Contact for Pricing</a>
+        </div>
+    </div>
+</body>
+</html>
