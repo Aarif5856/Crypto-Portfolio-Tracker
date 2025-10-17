@@ -1,0 +1,58 @@
+[
+  {
+    "appName": "CoinVision",
+    "logoUrl": "/logo.svg",
+    "primaryColor": "#00C2FF",
+    "secondaryColor": "#6366f1",
+    "accentColor": "#f59e0b",
+    "domain": "coinvision.app",
+    "supportEmail": "support@coinvision.app",
+    "appDescription": "Professional Crypto Portfolio Tracker",
+    "clientName": "coinvision",
+    "deployedUrl": "https://test-coinvision.vercel.app",
+    "status": "deployed",
+    "deployedAt": "2025-10-16T21:03:24.362Z"
+  },
+  {
+    "appName": "CryptoPro",
+    "logoUrl": "/logo.svg",
+    "primaryColor": "#10B981",
+    "secondaryColor": "#059669",
+    "accentColor": "#f59e0b",
+    "domain": "cryptopro.app",
+    "supportEmail": "support@cryptopro.app",
+    "appDescription": "Advanced Crypto Portfolio Management",
+    "clientName": "cryptopro",
+    "deployedUrl": "https://test-cryptopro.vercel.app",
+    "status": "deployed",
+    "deployedAt": "2025-10-16T21:04:12.846Z"
+  },
+  {
+    "appName": "BitTracker",
+    "logoUrl": "/logo.svg",
+    "primaryColor": "#F59E0B",
+    "secondaryColor": "#D97706",
+    "accentColor": "#EF4444",
+    "domain": "bittracker.app",
+    "supportEmail": "support@bittracker.app",
+    "appDescription": "Bitcoin & Crypto Portfolio Tracker",
+    "clientName": "bittracker",
+    "deployedUrl": "https://test-bittracker.vercel.app",
+    "status": "deployed",
+    "deployedAt": "2025-10-16T21:05:34.965Z"
+  },
+  {
+    "appName": "DeFiPortfolio",
+    "logoUrl": "/logo.svg",
+    "primaryColor": "#8B5CF6",
+    "secondaryColor": "#7C3AED",
+    "accentColor": "#EC4899",
+    "domain": "defiportfolio.app",
+    "supportEmail": "support@defiportfolio.app",
+    "appDescription": "DeFi Portfolio & Yield Tracker",
+    "clientName": "defiportfolio",
+    "deployedUrl": "https://test-defiportfolio.vercel.app",
+    "status": "deployed",
+    "deployedAt": "2025-10-16T21:06:36.420Z"
+  }
+]

@@ -1,0 +1,52 @@
+[
+  {
+    "appName": "CoinVision",
+    "logoUrl": "/logo.svg",
+    "primaryColor": "#00C2FF",
+    "secondaryColor": "#6366f1",
+    "accentColor": "#f59e0b",
+    "domain": "coinvision.app",
+    "supportEmail": "support@coinvision.app",
+    "appDescription": "Professional Crypto Portfolio Tracker"
+  },
+  {
+    "appName": "CryptoPro",
+    "logoUrl": "/logo.svg",
+    "primaryColor": "#10B981",
+    "secondaryColor": "#059669",
+    "accentColor": "#f59e0b",
+    "domain": "cryptopro.app",
+    "supportEmail": "support@cryptopro.app",
+    "appDescription": "Advanced Crypto Portfolio Management"
+  },
+  {
+    "appName": "BitTracker",
+    "logoUrl": "/logo.svg",
+    "primaryColor": "#F59E0B",
+    "secondaryColor": "#D97706",
+    "accentColor": "#EF4444",
+    "domain": "bittracker.app",
+    "supportEmail": "support@bittracker.app",
+    "appDescription": "Bitcoin & Crypto Portfolio Tracker"
+  },
+  {
+    "appName": "DeFiPortfolio",
+    "logoUrl": "/logo.svg",
+    "primaryColor": "#8B5CF6",
+    "secondaryColor": "#7C3AED",
+    "accentColor": "#EC4899",
+    "domain": "defiportfolio.app",
+    "supportEmail": "support@defiportfolio.app",
+    "appDescription": "DeFi Portfolio & Yield Tracker"
+  },
+  {
+    "appName": "CryptoMaster",
+    "logoUrl": "/logo.svg",
+    "primaryColor": "#EF4444",
+    "secondaryColor": "#DC2626",
+    "accentColor": "#F97316",
+    "domain": "cryptomaster.app",
+    "supportEmail": "support@cryptomaster.app",
+    "appDescription": "Master Your Crypto Investments"
+  }
+]
