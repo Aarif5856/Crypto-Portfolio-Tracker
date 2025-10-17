@@ -19,11 +19,11 @@ export const OnboardingProvider = ({ children }) => {
     const tutorialCompleted = localStorage.getItem('crypto-pro-tutorial-completed');
     setHasSeenTutorial(!!tutorialCompleted);
     
-    // Clear tutorial state for testing (remove this in production)
-    if (process.env.NODE_ENV === 'development') {
-      // Uncomment the line below to reset tutorial state
-      // localStorage.removeItem('crypto-pro-tutorial-completed');
-      // setHasSeenTutorial(false);
+    // For demo purposes, skip tutorial by default
+    // Users can still access it via the help button
+    if (!tutorialCompleted) {
+      localStorage.setItem('crypto-pro-tutorial-completed', 'true');
+      setHasSeenTutorial(true);
     }
   }, []);
 
