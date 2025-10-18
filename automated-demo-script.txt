@@ -1,0 +1,78 @@
+AUTOMATED DEMO SCRIPT - FOLLOW THESE STEPS EXACTLY
+
+=== STEP 1: PREPARE YOUR SCREEN ===
+1. Open 3 browser tabs:
+   - Tab 1: https://coinvision.vercel.app
+   - Tab 2: https://cryptopro.vercel.app  
+   - Tab 3: https://bittracker.vercel.app
+
+2. Open your GitHub repository:
+   - https://github.com/Aarif5856/Crypto-Portfolio-Tracker
+
+3. Open a text editor with this script
+
+=== STEP 2: RECORDING SEQUENCE ===
+
+TIMING: 0-10 seconds
+ACTION: Show CoinVision tab
+TEXT OVERLAY: "White-Label Crypto Portfolio Tracker"
+TEXT OVERLAY: "Client 1: CoinVision - Blue Branding"
+
+TIMING: 10-20 seconds  
+ACTION: Click around CoinVision, show wallet connection
+TEXT OVERLAY: "Professional Portfolio Tracking"
+TEXT OVERLAY: "One-Click Wallet Connection"
+
+TIMING: 20-30 seconds
+ACTION: Switch to CryptoPro tab
+TEXT OVERLAY: "Client 2: CryptoPro - Green Branding"
+TEXT OVERLAY: "Same Features, Different Branding"
+
+TIMING: 30-40 seconds
+ACTION: Show CryptoPro features, Pro upgrade button
+TEXT OVERLAY: "Advanced Portfolio Management"
+TEXT OVERLAY: "Built-in Pro Upgrade System"
+
+TIMING: 40-50 seconds
+ACTION: Switch to BitTracker tab
+TEXT OVERLAY: "Client 3: BitTracker - Orange Branding"
+TEXT OVERLAY: "Bitcoin-Focused Tracker"
+
+TIMING: 50-60 seconds
+ACTION: Show BitTracker features
+TEXT OVERLAY: "Custom Branding in Minutes"
+TEXT OVERLAY: "Same Powerful Features"
+
+TIMING: 60-70 seconds
+ACTION: Switch to GitHub repository
+TEXT OVERLAY: "Complete Source Code Available"
+TEXT OVERLAY: "Automation Scripts Included"
+
+TIMING: 70-80 seconds
+ACTION: Show repository files and documentation
+TEXT OVERLAY: "4 Sample Clients Pre-Built"
+TEXT OVERLAY: "Ready to Deploy"
+
+TIMING: 80-90 seconds
+ACTION: Show pricing slide
+TEXT OVERLAY: "Basic License: $500"
+TEXT OVERLAY: "Professional: $1,500"
+TEXT OVERLAY: "Enterprise: $3,000"
+
+TIMING: 90-100 seconds
+ACTION: Show call-to-action
+TEXT OVERLAY: "Start Your White-Label Business Today!"
+TEXT OVERLAY: "Contact: your-email@example.com"
+TEXT OVERLAY: "Don't Miss the Crypto Boom!"
+
+=== STEP 3: POST-PRODUCTION ===
+1. Add background music (subtle, professional)
+2. Add intro/outro graphics
+3. Add company logo/watermark
+4. Export as MP4
+
+=== STEP 4: UPLOAD & SHARE ===
+1. Upload to YouTube (unlisted)
+2. Upload to Vimeo (private)
+3. Share links with potential buyers
+4. Include in sales emails
