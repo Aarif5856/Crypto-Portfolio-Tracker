@@ -1,11 +1,37 @@
 import React from "react";
 import { ArrowRight, Wallet, LineChart, Zap, Shield } from "lucide-react";
 import { motion } from "framer-motion";
-import { PortfolioChart } from "../components/PortfolioChart";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  Tooltip,
+} from "chart.js";
+
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip);
 
 export default function Landing({ onNavigateToDashboard }) {
+  const chartData = {
+    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    datasets: [
+      {
+        label: "Portfolio Value ($)",
+        data: [3200, 3600, 4200, 4000, 4500, 4700, 5200],
+        borderColor: "#14b8a6",
+        backgroundColor: "rgba(20,184,166,0.2)",
+        tension: 0.4,
+        fill: true,
+        pointRadius: 4,
+        pointBackgroundColor: "#14b8a6",
+      },
+    ],
+  };
+
   return (
-    <div className="bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-indigo-900 via-purple-900 to-black min-h-screen text-gray-100 font-inter animate-gradient">
+    <div className="bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 min-h-screen text-gray-100 font-inter">
       {/* Navbar */}
       <header className="flex justify-between items-center px-8 py-6">
         <h1 className="text-2xl font-bold text-white">CryptoPro</h1>
@@ -30,7 +56,10 @@ export default function Landing({ onNavigateToDashboard }) {
           transition={{ duration: 0.8 }}
           className="text-4xl md:text-6xl font-bold text-white mb-6"
         >
-          Track & Grow Your <span className="text-teal-400">Crypto Portfolio</span>
+          Track & Grow Your{" "}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-cyan-300 to-indigo-400 animate-pulse">
+            Crypto Portfolio
+          </span>
         </motion.h2>
         <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-8">
           Monitor all your wallets, tokens, and assets in real-time.  
@@ -50,9 +79,19 @@ export default function Landing({ onNavigateToDashboard }) {
             💳 Upgrade to Pro
           </a>
         </div>
-        
-        {/* Portfolio Chart Preview */}
-        <PortfolioChart />
+
+        {/* Chart */}
+        <div className="mt-16">
+          <h3 className="text-xl font-semibold text-center mb-2 text-white">
+            Live Portfolio Performance
+          </h3>
+          <p className="text-gray-400 text-center mb-6">
+            Real-time tracking across all your wallets
+          </p>
+          <div className="max-w-3xl mx-auto bg-gray-900/70 p-6 rounded-2xl shadow-lg border border-teal-400/20">
+            <Line data={chartData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+          </div>
+        </div>
       </section>
 
       {/* Features Section */}
@@ -127,7 +166,7 @@ export default function Landing({ onNavigateToDashboard }) {
               className={`relative bg-gray-900/60 border border-gray-700 hover:border-teal-400 shadow-xl hover:shadow-teal-400/30 rounded-2xl p-8 transition-all duration-300 ${plan.color}`}
             >
               {plan.title === "Pro Plan" && (
-                <div className="absolute -top-3 right-0 bg-teal-500 text-black text-xs font-bold px-3 py-1 rounded-bl-xl">
+                <div className="absolute top-0 right-0 bg-teal-500 text-black text-xs font-bold px-3 py-1 rounded-bl-xl animate-pulse">
                   Most Popular
                 </div>
               )}
@@ -172,8 +211,11 @@ export default function Landing({ onNavigateToDashboard }) {
       </section>
 
       {/* Footer */}
-      <footer className="text-center py-10 text-gray-500 text-sm bg-gray-950/60 border-t border-gray-800">
-        © {new Date().getFullYear()} CryptoPro — Built with ❤️ by Aarif Mohamed
+      <footer className="text-center py-10 bg-gray-950/80 border-t border-gray-800 text-gray-400">
+        © {new Date().getFullYear()} CryptoPro · All Rights Reserved · 
+        <a href="https://github.com/Aarif5856" target="_blank" className="text-teal-400 hover:underline ml-1">
+          Built by Aarif
+        </a>
       </footer>
     </div>
   );
