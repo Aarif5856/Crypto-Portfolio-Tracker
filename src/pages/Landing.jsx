@@ -1,10 +1,11 @@
 import React from "react";
 import { ArrowRight, Wallet, LineChart, Zap, Shield } from "lucide-react";
 import { motion } from "framer-motion";
+import { PortfolioChart } from "../components/PortfolioChart";
 
 export default function Landing({ onNavigateToDashboard }) {
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 min-h-screen text-gray-100 font-inter">
+    <div className="bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-indigo-900 via-purple-900 to-black min-h-screen text-gray-100 font-inter animate-gradient">
       {/* Navbar */}
       <header className="flex justify-between items-center px-8 py-6">
         <h1 className="text-2xl font-bold text-white">CryptoPro</h1>
@@ -22,7 +23,7 @@ export default function Landing({ onNavigateToDashboard }) {
       </header>
 
       {/* Hero Section */}
-      <section className="text-center py-24 px-6">
+      <section className="text-center py-32 md:py-48 px-4 md:px-12">
         <motion.h2
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -49,12 +50,15 @@ export default function Landing({ onNavigateToDashboard }) {
             💳 Upgrade to Pro
           </a>
         </div>
+        
+        {/* Portfolio Chart Preview */}
+        <PortfolioChart />
       </section>
 
       {/* Features Section */}
       <section id="features" className="py-20 px-6 bg-gray-900/40 backdrop-blur-lg">
         <h3 className="text-3xl font-bold text-center mb-12">Why Choose CryptoPro</h3>
-        <div className="grid md:grid-cols-4 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto px-4 md:px-10">
           {[
             {
               icon: <Wallet size={36} />,
@@ -79,8 +83,8 @@ export default function Landing({ onNavigateToDashboard }) {
           ].map((item, i) => (
             <motion.div
               key={i}
-              whileHover={{ scale: 1.05 }}
-              className="bg-gray-800/50 p-6 rounded-2xl shadow-md hover:shadow-teal-400/20 transition"
+              whileHover={{ scale: 1.05, y: -4 }}
+              className="bg-gray-900/60 border border-transparent hover:border-teal-400/40 p-6 rounded-2xl shadow-md hover:shadow-teal-400/20 transition-all duration-300"
             >
               <div className="text-teal-400 mb-4">{item.icon}</div>
               <h4 className="font-semibold text-xl mb-2">{item.title}</h4>
@@ -93,7 +97,7 @@ export default function Landing({ onNavigateToDashboard }) {
       {/* Pricing Section */}
       <section id="pricing" className="py-24 px-6 text-center bg-gradient-to-b from-gray-900 via-purple-800 to-indigo-900">
         <h3 className="text-3xl font-bold mb-12">Simple, Transparent Pricing</h3>
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto px-4 md:px-10">
           {[
             {
               title: "Free Plan",
@@ -120,8 +124,13 @@ export default function Landing({ onNavigateToDashboard }) {
             <motion.div
               key={i}
               whileHover={{ scale: 1.03 }}
-              className={`rounded-2xl border ${plan.color} p-8 shadow-md transition`}
+              className={`relative bg-gray-900/60 border border-gray-700 hover:border-teal-400 shadow-xl hover:shadow-teal-400/30 rounded-2xl p-8 transition-all duration-300 ${plan.color}`}
             >
+              {plan.title === "Pro Plan" && (
+                <div className="absolute -top-3 right-0 bg-teal-500 text-black text-xs font-bold px-3 py-1 rounded-bl-xl">
+                  Most Popular
+                </div>
+              )}
               <h4 className="text-xl font-semibold mb-2">{plan.title}</h4>
               <p className="text-4xl font-bold text-teal-400 mb-4">{plan.price}</p>
               <ul className="text-gray-400 mb-6 space-y-2">
