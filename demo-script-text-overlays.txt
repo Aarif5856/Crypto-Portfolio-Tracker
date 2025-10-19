@@ -41,3 +41,4 @@ DEMO VIDEO TEXT OVERLAYS - COPY AND PASTE
 "GitHub: github.com/Aarif5856/Crypto-Portfolio-Tracker"
 "Contact for Custom Quote"
 "Don't Miss the Crypto Boom!"
+

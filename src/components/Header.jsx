@@ -6,7 +6,7 @@ import { useOnboarding } from '../context/OnboardingContext';
 import { appConfig } from '../config/appConfig';
 import ProBadge from './ProBadge';
 
-const Header = () => {
+const Header = ({ onNavigateToLanding }) => {
   const { account, isConnected, connectWallet, disconnectWallet } = useWallet();
   const { isDark, toggleTheme } = useTheme();
   const { startTutorial } = useOnboarding();
@@ -22,17 +22,22 @@ const Header = () => {
         <div className="flex justify-between items-center h-16 sm:h-18">
           {/* Logo and App Name */}
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 gradient-bg rounded-xl flex items-center justify-center shadow-sm">
-              <span className="text-white font-bold text-sm sm:text-base">
-                {appConfig.appName.charAt(0)}
-              </span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">
-                {appConfig.appName}
-              </h1>
-              <ProBadge isPro={true} showText={true} />
-            </div>
+            <button
+              onClick={onNavigateToLanding}
+              className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+            >
+              <div className="w-8 h-8 sm:w-10 sm:h-10 gradient-bg rounded-xl flex items-center justify-center shadow-sm">
+                <span className="text-white font-bold text-sm sm:text-base">
+                  {appConfig.appName.charAt(0)}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">
+                  {appConfig.appName}
+                </h1>
+                <ProBadge isPro={true} showText={true} />
+              </div>
+            </button>
           </div>
 
           {/* Right side controls */}
