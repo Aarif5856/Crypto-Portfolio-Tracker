@@ -7,6 +7,20 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true
+  },
+  build: {
+    chunkSizeWarningLimit: 1000, // Increase chunk size warning limit to 1000kb
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Split vendor libraries into separate chunks
+          vendor: ['react', 'react-dom'],
+          wallet: ['@rainbow-me/rainbowkit', 'wagmi', 'viem', 'ethers'],
+          ui: ['lucide-react', 'recharts', 'framer-motion'],
+          utils: ['axios', 'clsx']
+        }
+      }
+    }
   }
 })
 
