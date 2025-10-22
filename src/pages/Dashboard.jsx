@@ -85,7 +85,7 @@ const Dashboard = ({ onNavigateToLanding }) => {
           {/* Secondary Row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Upgrade to Pro */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1" id="upgrade-section">
               <UpgradeToPro />
             </div>
 
@@ -155,4 +155,3 @@ const Dashboard = ({ onNavigateToLanding }) => {
 };
 
 export default Dashboard;
-

@@ -43,7 +43,18 @@ const Header = ({ onNavigateToLanding }) => {
           {/* Right side controls */}
           <div className="flex items-center space-x-3 sm:space-x-4">
             {/* Upgrade to Pro Button - Hidden on mobile */}
-            <button className="hidden sm:block text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200">
+            <button
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('open-upgrade-modal'));
+                  const upgradeSection = document.getElementById('upgrade-section');
+                  if (upgradeSection) {
+                    upgradeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }
+              }}
+              className="hidden sm:block text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
+            >
               Upgrade to Pro
             </button>
 

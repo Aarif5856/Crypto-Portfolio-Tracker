@@ -1,15 +1,20 @@
-import React, { useState } from 'react';
-import { Crown, Check, Zap, BarChart3, Download, Bell } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Crown, Zap, BarChart3, Download, Bell } from 'lucide-react';
 import { appConfig } from '../config/appConfig';
 import StripeModal from './StripeModal';
 
 const UpgradeToPro = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  console.log('UpgradeToPro rendering, showUpgradeButton:', appConfig.monetization.showUpgradeButton);
-  console.log('Primary color:', appConfig.primaryColor);
-  console.log('Current theme:', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-  
+
+  const openModal = useCallback(() => setIsModalOpen(true), []);
+  const closeModal = useCallback(() => setIsModalOpen(false), []);
+
+  useEffect(() => {
+    const handler = () => openModal();
+    window.addEventListener('open-upgrade-modal', handler);
+    return () => window.removeEventListener('open-upgrade-modal', handler);
+  }, [openModal]);
+
   const proFeatures = [
     {
       icon: BarChart3,
@@ -37,7 +42,6 @@ const UpgradeToPro = () => {
     return null;
   }
 
-  // Fallback for debugging - always show something
   return (
     <div className="card text-white shadow-lg" style={{ backgroundColor: '#10B981', border: '2px solid #059669' }}>
       <div className="flex items-start justify-between mb-4">
@@ -70,22 +74,22 @@ const UpgradeToPro = () => {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <button 
-          onClick={() => setIsModalOpen(true)}
+        <button
+          onClick={openModal}
           className="flex-1 font-medium py-3 px-4 rounded-lg transition-colors duration-200 shadow-lg"
-          style={{ 
-            backgroundColor: '#FFFFFF', 
+          style={{
+            backgroundColor: '#FFFFFF',
             color: '#10B981',
             border: '2px solid #10B981',
             fontWeight: 'bold',
             fontSize: '16px',
-            textShadow: 'none'
+            textShadow: 'none',
           }}
         >
           Start Free Trial
         </button>
-        <button 
-          onClick={() => setIsModalOpen(true)}
+        <button
+          onClick={openModal}
           className="flex-1 bg-white/20 hover:bg-white/30 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 border border-white/30"
         >
           Learn More
@@ -93,17 +97,12 @@ const UpgradeToPro = () => {
       </div>
 
       <div className="mt-4 text-xs text-white/70 text-center">
-        Cancel anytime â€¢ No setup fees â€¢ 30-day money-back guarantee
+        Cancel anytime • No setup fees • 30-day money-back guarantee
       </div>
-      
-      <StripeModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-      />
+
+      <StripeModal isOpen={isModalOpen} onClose={closeModal} />
     </div>
   );
-
 };
 
 export default UpgradeToPro;
-
