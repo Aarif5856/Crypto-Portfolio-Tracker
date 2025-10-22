@@ -43,7 +43,7 @@ export const OnboardingProvider = ({ children }) => {
 
   // Add global function for debugging
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env && import.meta.env.DEV) {
       window.clearTutorial = resetTutorial;
     }
   }, []);

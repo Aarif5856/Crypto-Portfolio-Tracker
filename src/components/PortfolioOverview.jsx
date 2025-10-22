@@ -1,39 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { TrendingUp, TrendingDown, RefreshCw, DollarSign } from 'lucide-react';
 import { useWallet } from '../context/WalletContext';
 import { getPortfolioData } from '../utils/portfolio';
+import { useQuery } from '@tanstack/react-query';
 import { formatCurrency, formatPercentage } from '../utils/portfolio';
 
 const PortfolioOverview = () => {
-  const { provider, account, isConnected } = useWallet();
-  const [portfolioData, setPortfolioData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { provider, account, chainId, isConnected } = useWallet();
 
-  const fetchPortfolioData = async () => {
-    if (!provider || !account) return;
+  const enabled = Boolean(isConnected && provider && account);
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const data = await getPortfolioData(provider, account);
-      setPortfolioData(data);
-    } catch (err) {
-      console.error('Error fetching portfolio data:', err);
-      setError('Failed to fetch portfolio data');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    data: portfolioData,
+    isLoading: loading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['portfolio', account, chainId],
+    queryFn: async () => {
+      return getPortfolioData(provider, account, chainId);
+    },
+    enabled,
+    refetchInterval: 30000,
+  });
 
   useEffect(() => {
-    if (isConnected) {
-      fetchPortfolioData();
-    } else {
-      setPortfolioData(null);
-    }
-  }, [isConnected, account]);
+    // reset happens automatically via query key change
+  }, [isConnected, account, chainId]);
 
   if (!isConnected) {
     return (
@@ -58,7 +52,7 @@ const PortfolioOverview = () => {
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
       <div className="card text-center py-12">
         <div className="text-red-500 mb-4">
@@ -67,9 +61,9 @@ const PortfolioOverview = () => {
         <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
           Error Loading Portfolio
         </h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+        <p className="text-gray-600 dark:text-gray-400 mb-4">{String(error)}</p>
         <button
-          onClick={fetchPortfolioData}
+          onClick={() => refetch()}
           className="btn-primary"
         >
           Try Again
@@ -109,7 +103,7 @@ const PortfolioOverview = () => {
             Portfolio Value
           </h2>
           <button
-            onClick={fetchPortfolioData}
+            onClick={() => refetch()}
             disabled={loading}
             className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50"
           >
@@ -191,4 +185,3 @@ const PortfolioOverview = () => {
 };
 
 export default PortfolioOverview;
-

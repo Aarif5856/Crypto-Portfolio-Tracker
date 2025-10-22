@@ -7,7 +7,7 @@ import { appConfig } from '../config/appConfig';
 import ProBadge from './ProBadge';
 
 const Header = ({ onNavigateToLanding }) => {
-  const { account, isConnected, connectWallet, disconnectWallet } = useWallet();
+  const { account, isConnected, connectWallet, disconnectWallet, networkName } = useWallet();
   const { isDark, toggleTheme } = useTheme();
   const { startTutorial } = useOnboarding();
 
@@ -81,9 +81,8 @@ const Header = ({ onNavigateToLanding }) => {
               <div className="flex items-center space-x-2 sm:space-x-3">
                 <div className="hidden sm:flex items-center space-x-2 px-3 py-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium text-green-700 dark:text-green-400">
-                    {formatAddress(account)}
-                  </span>
+                  <span className="text-sm font-medium text-green-700 dark:text-green-400">{networkName}</span>
+                  <span className="text-sm font-medium text-green-700 dark:text-green-400">{formatAddress(account)}</span>
                 </div>
                 <div className="sm:hidden flex items-center space-x-1 px-2 py-1.5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
@@ -117,4 +116,3 @@ const Header = ({ onNavigateToLanding }) => {
 };
 
 export default Header;
-

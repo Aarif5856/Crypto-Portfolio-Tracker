@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, Github, Twitter, MessageCircle } from 'lucide-react';
+import { Github, Twitter, MessageCircle } from 'lucide-react';
 import { appConfig } from '../config/appConfig';
 
 const Footer = () => {
@@ -47,3 +47,4 @@ const Footer = () => {
 };
 
 export default Footer;
+

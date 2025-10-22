@@ -126,7 +126,7 @@ const OnboardingTutorial = () => {
     },
     {
       id: 'complete',
-      title: 'You\'re All Set!',
+      title: "You're All Set!",
       description: 'Start tracking your crypto portfolio like a pro',
       icon: <CheckCircle className="w-12 h-12 text-green-500" />,
       content: (
@@ -136,7 +136,7 @@ const OnboardingTutorial = () => {
           </p>
           <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
             <p className="text-sm text-green-700 dark:text-green-300">
-              💡 <strong>Pro Tip:</strong> You can always access this tutorial again from the settings menu
+              Pro Tip: You can always access this tutorial again from the settings menu
             </p>
           </div>
           <div className="flex justify-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
@@ -289,3 +289,4 @@ const OnboardingTutorial = () => {
 };
 
 export default OnboardingTutorial;
+

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Wallet, ExternalLink, Check } from 'lucide-react';
+import { X, Wallet, ExternalLink } from 'lucide-react';
 import { useWallet } from '../context/WalletContext';
 
 const WalletConnectModal = ({ isOpen, onClose }) => {
@@ -8,38 +8,18 @@ const WalletConnectModal = ({ isOpen, onClose }) => {
 
   // Mock connectors for the modal
   const connectors = [
-    { id: 'metaMask', name: 'MetaMask' },
-    { id: 'walletConnect', name: 'WalletConnect' },
-    { id: 'coinbaseWallet', name: 'Coinbase Wallet' },
-    { id: 'phantom', name: 'Phantom' },
-    { id: 'rainbow', name: 'Rainbow' },
-    { id: 'trust', name: 'Trust Wallet' },
+    { id: 'metaMask', name: 'MetaMask', icon: '🦊' },
+    { id: 'walletConnect', name: 'WalletConnect', icon: '🔗' },
+    { id: 'coinbaseWallet', name: 'Coinbase Wallet', icon: '🪙' },
+    { id: 'phantom', name: 'Phantom', icon: '👻' },
+    { id: 'rainbow', name: 'Rainbow', icon: '🌈' },
+    { id: 'trust', name: 'Trust Wallet', icon: '🔒' },
   ];
 
   const handleConnect = async (connectorId) => {
     setSelectedConnector(connectorId);
     await connectWallet();
     onClose();
-  };
-
-  const walletIcons = {
-    metaMask: '🦊',
-    walletConnect: '🔗',
-    coinbaseWallet: '🔵',
-    phantom: '👻',
-    rainbow: '🌈',
-    trust: '🛡️',
-  };
-
-  const getWalletIcon = (connectorName) => {
-    const name = connectorName.toLowerCase();
-    if (name.includes('metamask')) return walletIcons.metaMask;
-    if (name.includes('walletconnect')) return walletIcons.walletConnect;
-    if (name.includes('coinbase')) return walletIcons.coinbaseWallet;
-    if (name.includes('phantom')) return walletIcons.phantom;
-    if (name.includes('rainbow')) return walletIcons.rainbow;
-    if (name.includes('trust')) return walletIcons.trust;
-    return '💳';
   };
 
   if (!isOpen) return null;
@@ -82,7 +62,7 @@ const WalletConnectModal = ({ isOpen, onClose }) => {
               >
                 <div className="flex items-center space-x-4">
                   <div className="text-2xl">
-                    {getWalletIcon(connector.name)}
+                    {connector.icon}
                   </div>
                   <div className="text-left">
                     <div className="font-medium text-gray-900 dark:text-white">

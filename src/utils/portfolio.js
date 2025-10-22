@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { getMultipleTokenPrices, getETHPrice } from './coingecko';
+import { getMultipleTokenPrices, getNativePrice } from './coingecko';
 
 // Common ERC-20 token ABI for balance checking
 const ERC20_ABI = [
@@ -34,64 +34,29 @@ const ERC20_ABI = [
 ];
 
 // Popular token contracts on Ethereum mainnet
-export const POPULAR_TOKENS = [
-  {
-    address: '0x0000000000000000000000000000000000000000',
-    symbol: 'ETH',
-    name: 'Ethereum',
-    decimals: 18,
-    isNative: true,
-  },
-  {
-    address: '0xA0b86a33E6441b8C4C8C0C4C0C4C0C4C0C4C0C4',
-    symbol: 'USDC',
-    name: 'USD Coin',
-    decimals: 6,
-    isNative: false,
-  },
-  {
-    address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-    symbol: 'USDT',
-    name: 'Tether',
-    decimals: 6,
-    isNative: false,
-  },
-  {
-    address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-    symbol: 'DAI',
-    name: 'Dai Stablecoin',
-    decimals: 18,
-    isNative: false,
-  },
-  {
-    address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
-    symbol: 'WBTC',
-    name: 'Wrapped Bitcoin',
-    decimals: 8,
-    isNative: false,
-  },
-  {
-    address: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
-    symbol: 'UNI',
-    name: 'Uniswap',
-    decimals: 18,
-    isNative: false,
-  },
-  {
-    address: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
-    symbol: 'MATIC',
-    name: 'Polygon',
-    decimals: 18,
-    isNative: false,
-  },
-  {
-    address: '0x514910771AF9Ca656af840dff83E8264EcF986CA',
-    symbol: 'LINK',
-    name: 'Chainlink',
-    decimals: 18,
-    isNative: false,
-  },
-];
+export const POPULAR_TOKENS_BY_CHAIN = {
+  1: [
+    { address: '0x0000000000000000000000000000000000000000', symbol: 'ETH', name: 'Ethereum', decimals: 18, isNative: true },
+    { address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', symbol: 'USDC', name: 'USD Coin', decimals: 6, isNative: false },
+    { address: '0xdac17f958d2ee523a2206206994597c13d831ec7', symbol: 'USDT', name: 'Tether', decimals: 6, isNative: false },
+    { address: '0x6b175474e89094c44da98b954eedeac495271d0f', symbol: 'DAI', name: 'Dai Stablecoin', decimals: 18, isNative: false },
+    { address: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', symbol: 'WBTC', name: 'Wrapped Bitcoin', decimals: 8, isNative: false },
+    { address: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', symbol: 'UNI', name: 'Uniswap', decimals: 18, isNative: false },
+    { address: '0x514910771af9ca656af840dff83e8264ecf986ca', symbol: 'LINK', name: 'Chainlink', decimals: 18, isNative: false },
+  ],
+  137: [
+    { address: '0x0000000000000000000000000000000000000000', symbol: 'MATIC', name: 'Polygon', decimals: 18, isNative: true },
+    { address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174', symbol: 'USDC', name: 'USD Coin', decimals: 6, isNative: false },
+    { address: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f', symbol: 'USDT', name: 'Tether', decimals: 6, isNative: false },
+    { address: '0x8f3cf7ad23cd3cadbd9735aff958023239c6a063', symbol: 'DAI', name: 'Dai Stablecoin', decimals: 18, isNative: false },
+  ],
+  56: [
+    { address: '0x0000000000000000000000000000000000000000', symbol: 'BNB', name: 'BNB', decimals: 18, isNative: true },
+    { address: '0x55d398326f99059ff775485246999027b3197955', symbol: 'USDT', name: 'Tether', decimals: 18, isNative: false },
+    { address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d', symbol: 'USDC', name: 'USD Coin', decimals: 18, isNative: false },
+    { address: '0xe9e7cea3dedca5984780bafc599bd69add087d56', symbol: 'BUSD', name: 'Binance USD', decimals: 18, isNative: false },
+  ],
+};
 
 // Get token balance
 export const getTokenBalance = async (provider, tokenAddress, userAddress, decimals = 18) => {
@@ -142,17 +107,26 @@ export const getTokenInfo = async (provider, tokenAddress) => {
 };
 
 // Get portfolio data for a user
-export const getPortfolioData = async (provider, userAddress) => {
+export const getPortfolioData = async (provider, userAddress, chainIdInput) => {
   try {
     const portfolio = [];
     let totalValueUSD = 0;
 
-    // Get ETH price first
-    const ethPriceData = await getETHPrice();
-    const ethPrice = ethPriceData.price;
+    // Determine chain
+    let chainId = chainIdInput;
+    if (!chainId) {
+      const network = await provider.getNetwork();
+      chainId = Number(network.chainId);
+    }
+
+    const tokens = POPULAR_TOKENS_BY_CHAIN[chainId] || POPULAR_TOKENS_BY_CHAIN[1];
+
+    // Get native price first
+    const nativePriceData = await getNativePrice(chainId);
+    const nativePrice = nativePriceData.price;
 
     // Check each popular token
-    for (const token of POPULAR_TOKENS) {
+    for (const token of tokens) {
       const balance = await getTokenBalance(
         provider,
         token.address,
@@ -168,13 +142,12 @@ export const getPortfolioData = async (provider, userAddress) => {
         let change24h = 0;
 
         if (token.isNative) {
-          // ETH
-          priceUSD = ethPrice;
-          change24h = ethPriceData.change24h;
+          priceUSD = nativePrice;
+          change24h = nativePriceData.change24h;
         } else {
           // ERC-20 tokens
           try {
-            const priceData = await getMultipleTokenPrices([token.address]);
+            const priceData = await getMultipleTokenPrices([token.address], chainId);
             const tokenPriceData = priceData[token.address.toLowerCase()];
             if (tokenPriceData) {
               priceUSD = tokenPriceData.price;

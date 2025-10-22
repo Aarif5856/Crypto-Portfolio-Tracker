@@ -142,6 +142,24 @@ export const WalletProvider = ({ children }) => {
     setError(null);
   };
 
+  const switchNetwork = async (targetChainId) => {
+    if (!window.ethereum) {
+      setError('Wallet not available');
+      return;
+    }
+    const hexId = '0x' + Number(targetChainId).toString(16);
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: hexId }],
+      });
+    } catch (switchError) {
+      // If the chain is not added to MetaMask, you could request to add it here.
+      console.error('Error switching network:', switchError);
+      setError('Failed to switch network');
+    }
+  };
+
   const refreshBalance = async () => {
     if (provider && account) {
       try {
@@ -167,6 +185,7 @@ export const WalletProvider = ({ children }) => {
     connectWallet,
     disconnectWallet,
     refreshBalance,
+    switchNetwork,
   };
 
   return (
@@ -175,4 +194,3 @@ export const WalletProvider = ({ children }) => {
     </WalletContext.Provider>
   );
 };
-

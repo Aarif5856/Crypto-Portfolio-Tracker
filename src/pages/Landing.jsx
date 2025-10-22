@@ -62,7 +62,7 @@ export default function Landing({ onNavigateToDashboard }) {
           </span>
         </motion.h2>
         <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-8">
-          Monitor all your wallets, tokens, and assets in real-time.  
+          Monitor all your wallets, tokens, and assets in real-time.
           Secure, customizable, and ready for white-label resale.
         </p>
         <div className="flex justify-center space-x-4">
@@ -70,13 +70,13 @@ export default function Landing({ onNavigateToDashboard }) {
             onClick={onNavigateToDashboard}
             className="bg-teal-500 hover:bg-teal-400 text-black px-6 py-3 rounded-xl font-semibold shadow-md flex items-center gap-2 transition"
           >
-            🚀 Live Demo <ArrowRight size={18} />
+            Live Demo <ArrowRight size={18} />
           </button>
           <a
             href="#pricing"
             className="border border-teal-400 hover:bg-teal-400/10 text-teal-300 px-6 py-3 rounded-xl font-semibold transition"
           >
-            💳 Upgrade to Pro
+            Upgrade to Pro
           </a>
         </div>
 
@@ -174,7 +174,7 @@ export default function Landing({ onNavigateToDashboard }) {
               <p className="text-4xl font-bold text-teal-400 mb-4">{plan.price}</p>
               <ul className="text-gray-400 mb-6 space-y-2">
                 {plan.features.map((f, idx) => (
-                  <li key={idx}>✅ {f}</li>
+                  <li key={idx}>• {f}</li>
                 ))}
               </ul>
               <button className="bg-teal-500 hover:bg-teal-400 text-black px-6 py-2 rounded-xl font-semibold transition">
@@ -212,7 +212,7 @@ export default function Landing({ onNavigateToDashboard }) {
 
       {/* Footer */}
       <footer className="text-center py-10 bg-gray-950/80 border-t border-gray-800 text-gray-400">
-        © {new Date().getFullYear()} CryptoPro · All Rights Reserved · 
+        © {new Date().getFullYear()} CryptoPro — All Rights Reserved —
         <a href="https://github.com/Aarif5856" target="_blank" className="text-teal-400 hover:underline ml-1">
           Built by Aarif
         </a>

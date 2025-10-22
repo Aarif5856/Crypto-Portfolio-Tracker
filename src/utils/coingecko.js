@@ -63,27 +63,36 @@ coingeckoAPI.interceptors.response.use(
 );
 
 // Common token addresses and their CoinGecko IDs
-export const TOKEN_MAP = {
-  // Ethereum
-  '0x0000000000000000000000000000000000000000': 'ethereum',
-  
-  // Popular ERC-20 tokens
-  '0xA0b86a33E6441b8C4C8C0C4C0C4C0C4C0C4C0C4': 'usd-coin', // USDC
-  '0xdAC17F958D2ee523a2206206994597C13D831ec7': 'tether', // USDT
-  '0x6B175474E89094C44Da98b954EedeAC495271d0F': 'dai', // DAI
-  '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599': 'wrapped-bitcoin', // WBTC
-  '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984': 'uniswap', // UNI
-  '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0': 'matic-network', // MATIC
-  '0x514910771AF9Ca656af840dff83E8264EcF986CA': 'chainlink', // LINK
-  '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2': 'maker', // MKR
-  '0x0F5D2fB29fb7d3CFeE444a200298f468908cC942': 'decentraland', // MANA
-  '0x4Fabb145d64652a948d72533023f6E7A623C7C53': 'binance-usd', // BUSD
+// CoinGecko token id lookup by chainId -> address -> coinId
+export const TOKEN_MAP_BY_CHAIN = {
+  1: {
+    '0x0000000000000000000000000000000000000000': 'ethereum',
+    '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48': 'usd-coin', // USDC
+    '0xdac17f958d2ee523a2206206994597c13d831ec7': 'tether', // USDT
+    '0x6b175474e89094c44da98b954eedeac495271d0f': 'dai', // DAI
+    '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599': 'wrapped-bitcoin', // WBTC
+    '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984': 'uniswap', // UNI
+    '0x514910771af9ca656af840dff83e8264ecf986ca': 'chainlink', // LINK
+  },
+  137: {
+    '0x0000000000000000000000000000000000000000': 'matic-network', // Native MATIC
+    '0x2791bca1f2de4661ed88a30c99a7a9449aa84174': 'usd-coin', // USDC (Polygon)
+    '0xc2132d05d31c914a87c6611c10748aeb04b58e8f': 'tether', // USDT (Polygon)
+    '0x8f3cf7ad23cd3cadbd9735aff958023239c6a063': 'dai', // DAI (Polygon)
+  },
+  56: {
+    '0x0000000000000000000000000000000000000000': 'binancecoin', // Native BNB
+    '0x55d398326f99059ff775485246999027b3197955': 'tether', // USDT (BSC)
+    '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d': 'usd-coin', // USDC (BSC)
+    '0xe9e7cea3dedca5984780bafc599bd69add087d56': 'binance-usd', // BUSD (BSC)
+  },
 };
 
 // Get token price by contract address
-export const getTokenPrice = async (contractAddress) => {
+export const getTokenPrice = async (contractAddress, chainId = 1) => {
   try {
-    const coinId = TOKEN_MAP[contractAddress.toLowerCase()];
+    const map = TOKEN_MAP_BY_CHAIN[chainId] || TOKEN_MAP_BY_CHAIN[1];
+    const coinId = map[contractAddress.toLowerCase()];
     
     if (!coinId) {
       throw new Error(`Token not supported: ${contractAddress}`);
@@ -112,10 +121,13 @@ export const getTokenPrice = async (contractAddress) => {
 };
 
 // Get multiple token prices
-export const getMultipleTokenPrices = async (contractAddresses) => {
+export const getMultipleTokenPrices = async (contractAddresses, chainId = 1) => {
   try {
-    const coinIds = contractAddresses
-      .map(addr => TOKEN_MAP[addr.toLowerCase()])
+    const map = TOKEN_MAP_BY_CHAIN[chainId] || TOKEN_MAP_BY_CHAIN[1];
+    // Normalize addresses to lowercase for consistent lookups
+    const lowerAddrs = (contractAddresses || []).map(a => a.toLowerCase());
+    const coinIds = lowerAddrs
+      .map(addr => map[addr])
       .filter(Boolean);
 
     if (coinIds.length === 0) {
@@ -134,8 +146,8 @@ export const getMultipleTokenPrices = async (contractAddresses) => {
 
     // Map back to contract addresses
     const result = {};
-    Object.entries(TOKEN_MAP).forEach(([address, coinId]) => {
-      if (contractAddresses.includes(address.toLowerCase()) && response.data[coinId]) {
+    Object.entries(map).forEach(([address, coinId]) => {
+      if (lowerAddrs.includes(address.toLowerCase()) && response.data[coinId]) {
         result[address.toLowerCase()] = {
           price: response.data[coinId].usd,
           change24h: response.data[coinId].usd_24h_change,
@@ -155,21 +167,23 @@ export const getMultipleTokenPrices = async (contractAddresses) => {
 // Fallback price data (cached from last successful request)
 let fallbackPrices = {
   ethereum: { price: 2000, change24h: 0, volume24h: 0, marketCap: 0 },
+  'matic-network': { price: 1, change24h: 0, volume24h: 0, marketCap: 0 },
+  binancecoin: { price: 300, change24h: 0, volume24h: 0, marketCap: 0 },
   'usd-coin': { price: 1, change24h: 0, volume24h: 0, marketCap: 0 },
   tether: { price: 1, change24h: 0, volume24h: 0, marketCap: 0 },
   dai: { price: 1, change24h: 0, volume24h: 0, marketCap: 0 },
   'wrapped-bitcoin': { price: 50000, change24h: 0, volume24h: 0, marketCap: 0 },
   uniswap: { price: 10, change24h: 0, volume24h: 0, marketCap: 0 },
-  'matic-network': { price: 1, change24h: 0, volume24h: 0, marketCap: 0 },
   chainlink: { price: 15, change24h: 0, volume24h: 0, marketCap: 0 },
 };
 
 // Get ETH price
-export const getETHPrice = async () => {
+export const getNativePrice = async (chainId = 1) => {
   try {
+    const id = chainId === 137 ? 'matic-network' : chainId === 56 ? 'binancecoin' : 'ethereum';
     const response = await coingeckoAPI.get(`/simple/price`, {
       params: {
-        ids: 'ethereum',
+        ids: id,
         vs_currencies: 'usd',
         include_24hr_change: true,
         include_24hr_vol: true,
@@ -178,20 +192,24 @@ export const getETHPrice = async () => {
     });
 
     const priceData = {
-      price: response.data.ethereum.usd,
-      change24h: response.data.ethereum.usd_24h_change,
-      volume24h: response.data.ethereum.usd_24h_vol,
-      marketCap: response.data.ethereum.usd_market_cap,
+      price: response.data[id].usd,
+      change24h: response.data[id].usd_24h_change,
+      volume24h: response.data[id].usd_24h_vol,
+      marketCap: response.data[id].usd_market_cap,
     };
 
     // Update fallback data
-    fallbackPrices.ethereum = priceData;
+    fallbackPrices[id] = priceData;
     return priceData;
   } catch (error) {
-    console.error('Error fetching ETH price, using fallback:', error);
-    return fallbackPrices.ethereum;
+    console.error('Error fetching native asset price, using fallback:', error);
+    const id = chainId === 137 ? 'matic-network' : chainId === 56 ? 'binancecoin' : 'ethereum';
+    return fallbackPrices[id];
   }
 };
+
+// Backward compatible alias
+export const getETHPrice = () => getNativePrice(1);
 
 // Get trending coins
 export const getTrendingCoins = async () => {
@@ -225,4 +243,3 @@ export const getGlobalMarketData = async () => {
     throw error;
   }
 };
-

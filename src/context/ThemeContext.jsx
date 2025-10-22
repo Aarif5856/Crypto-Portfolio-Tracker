@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { generateThemeCSS } from '../config/appConfig';
 
 const ThemeContext = createContext();
 
@@ -15,6 +16,20 @@ export const ThemeProvider = ({ children }) => {
 
   // Load theme preference from localStorage on mount
   useEffect(() => {
+    // Inject dynamic theme CSS based on appConfig
+    try {
+      const css = generateThemeCSS();
+      let styleTag = document.getElementById('dynamic-theme');
+      if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'dynamic-theme';
+        document.head.appendChild(styleTag);
+      }
+      styleTag.innerHTML = css;
+    } catch (e) {
+      // no-op if injection fails
+    }
+
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     

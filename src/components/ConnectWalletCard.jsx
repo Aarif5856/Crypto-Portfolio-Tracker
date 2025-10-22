@@ -13,7 +13,7 @@ const ConnectWalletCard = () => {
 
   return (
     <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border border-indigo-100 dark:border-indigo-800 rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300">
-      <div className="text-6xl mb-4">💰</div>
+      <div className="text-6xl mb-4">🔗</div>
       <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">
         Connect Your Wallet
       </h2>
@@ -42,3 +42,4 @@ const ConnectWalletCard = () => {
 };
 
 export default ConnectWalletCard;
+
