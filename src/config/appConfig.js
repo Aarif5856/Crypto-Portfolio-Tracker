@@ -59,7 +59,7 @@ export const appConfig = {
 
 // Generate CSS custom properties for dynamic theming
 export const generateThemeCSS = () => {
-  const { primaryColor, secondaryColor, accentColor } = appConfig;
+  const { primaryColor } = appConfig;
   
   // Convert hex to RGB for CSS custom properties
   const hexToRgb = (hex) => {
@@ -72,8 +72,6 @@ export const generateThemeCSS = () => {
   };
   
   const primaryRgb = hexToRgb(primaryColor);
-  const secondaryRgb = hexToRgb(secondaryColor);
-  const accentRgb = hexToRgb(accentColor);
   
   return `
     :root {

@@ -1,33 +1,23 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { TrendingUp, TrendingDown, RefreshCw, DollarSign } from 'lucide-react';
 import { useWallet } from '../context/WalletContext';
-import { getPortfolioData } from '../utils/portfolio';
-import { useQuery } from '@tanstack/react-query';
 import { formatCurrency, formatPercentage } from '../utils/portfolio';
 
-const PortfolioOverview = () => {
-  const { provider, account, chainId, isConnected } = useWallet();
-
-  const enabled = Boolean(isConnected && provider && account);
-
+const PortfolioOverview = ({ portfolioQuery }) => {
+  const { isConnected } = useWallet();
   const {
     data: portfolioData,
     isLoading: loading,
     isError,
     error,
     refetch,
-  } = useQuery({
-    queryKey: ['portfolio', account, chainId],
-    queryFn: async () => {
-      return getPortfolioData(provider, account, chainId);
-    },
-    enabled,
-    refetchInterval: 30000,
-  });
-
-  useEffect(() => {
-    // reset happens automatically via query key change
-  }, [isConnected, account, chainId]);
+  } = portfolioQuery ?? {
+    data: null,
+    isLoading: false,
+    isError: false,
+    error: null,
+    refetch: () => {},
+  };
 
   if (!isConnected) {
     return (

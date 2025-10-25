@@ -1,126 +1,161 @@
-import React, { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { getMultipleTokenPrices } from '../utils/coingecko';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ArrowUpRight, ArrowDownRight, RefreshCw } from 'lucide-react';
+import { getCoinMarketData } from '../utils/coingecko';
+
+const DEFAULT_TOKEN_IDS = [
+  'bitcoin',
+  'ethereum',
+  'binancecoin',
+  'cardano',
+  'solana',
+  'matic-network',
+  'polkadot',
+  'avalanche-2',
+  'chainlink',
+];
+
+const TOP_MOVERS_CACHE_KEY = 'top-movers-cache';
 
 const TopMovers = () => {
   const [topMovers, setTopMovers] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const popularTokens = [
-    { symbol: 'BTC', name: 'Bitcoin', id: 'bitcoin' },
-    { symbol: 'ETH', name: 'Ethereum', id: 'ethereum' },
-    { symbol: 'BNB', name: 'BNB', id: 'binancecoin' },
-    { symbol: 'ADA', name: 'Cardano', id: 'cardano' },
-    { symbol: 'SOL', name: 'Solana', id: 'solana' },
-    { symbol: 'MATIC', name: 'Polygon', id: 'matic-network' },
-    { symbol: 'DOT', name: 'Polkadot', id: 'polkadot' },
-    { symbol: 'AVAX', name: 'Avalanche', id: 'avalanche-2' },
-  ];
+  const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
-    const fetchTopMovers = async () => {
+    if (typeof window === 'undefined') return;
+    const cached = localStorage.getItem(TOP_MOVERS_CACHE_KEY);
+    if (cached) {
       try {
-        setLoading(true);
-        // Note: This is a simplified version - in production you'd use proper API calls
-        const prices = {};
-        
-        // Use fallback data since we're not making real API calls
-        const movers = [
-          { symbol: 'BTC', name: 'Bitcoin', price: 43250, change24h: 2.5, isPositive: true },
-          { symbol: 'ETH', name: 'Ethereum', price: 2650, change24h: -1.2, isPositive: false },
-          { symbol: 'SOL', name: 'Solana', price: 98, change24h: 5.8, isPositive: true },
-          { symbol: 'ADA', name: 'Cardano', price: 0.45, change24h: -0.8, isPositive: false },
-          { symbol: 'MATIC', name: 'Polygon', price: 0.85, change24h: 3.2, isPositive: true },
-        ];
-
-        setTopMovers(movers);
-      } catch (error) {
-        console.error('Error fetching top movers:', error);
-        // Fallback data
-        setTopMovers([
-          { symbol: 'BTC', name: 'Bitcoin', price: 43250, change24h: 2.5, isPositive: true },
-          { symbol: 'ETH', name: 'Ethereum', price: 2650, change24h: -1.2, isPositive: false },
-          { symbol: 'SOL', name: 'Solana', price: 98, change24h: 5.8, isPositive: true },
-          { symbol: 'ADA', name: 'Cardano', price: 0.45, change24h: -0.8, isPositive: false },
-          { symbol: 'MATIC', name: 'Polygon', price: 0.85, change24h: 3.2, isPositive: true },
-        ]);
-      } finally {
+        const parsed = JSON.parse(cached);
+        setTopMovers(parsed.data || []);
+        setLastUpdated(parsed.updatedAt || null);
         setLoading(false);
+      } catch {
+        setTopMovers([]);
       }
-    };
-
-    fetchTopMovers();
+    }
   }, []);
 
-  if (loading) {
-    return (
-      <div className="card">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Top Movers</h3>
-          <TrendingUp className="w-5 h-5 text-primary-500" />
+  const fetchTopMovers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const marketData = await getCoinMarketData(DEFAULT_TOKEN_IDS);
+      const ranked = [...marketData]
+        .sort(
+          (a, b) =>
+            (b.price_change_percentage_24h ?? 0) - (a.price_change_percentage_24h ?? 0)
+        )
+        .slice(0, 5);
+      setTopMovers(ranked);
+      const timestamp = Date.now();
+      setLastUpdated(timestamp);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(
+          TOP_MOVERS_CACHE_KEY,
+          JSON.stringify({ data: ranked, updatedAt: timestamp })
+        );
+      }
+    } catch (err) {
+      console.error('Error fetching top movers:', err);
+      setError('Unable to refresh top movers. Showing cached data.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTopMovers();
+    const interval = window.setInterval(fetchTopMovers, 60000);
+    return () => window.clearInterval(interval);
+  }, [fetchTopMovers]);
+
+  return (
+    <div className="card">
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Top Movers</h3>
+        <button
+          onClick={fetchTopMovers}
+          className="rounded-lg p-2 text-primary-500 transition-colors hover:bg-primary-50 dark:hover:bg-primary-900/20"
+          aria-label="Refresh top movers"
+        >
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+        </button>
+      </div>
+
+      {error && (
+        <div className="mb-3 rounded-lg border border-yellow-300 bg-yellow-50 p-2 text-xs text-yellow-700 dark:border-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200">
+          {error}
         </div>
+      )}
+
+      {lastUpdated && topMovers.length > 0 && (
+        <p className="mb-3 text-xs text-gray-500 dark:text-gray-400">
+          Last updated {new Date(lastUpdated).toLocaleTimeString()}
+        </p>
+      )}
+
+      {loading ? (
         <div className="space-y-3">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="animate-pulse">
+          {[...Array(5)].map((_, index) => (
+            <div key={index} className="animate-pulse">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                  <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700"></div>
                   <div className="space-y-1">
-                    <div className="w-16 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                    <div className="w-12 h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                    <div className="h-4 w-16 rounded bg-gray-200 dark:bg-gray-700"></div>
+                    <div className="h-3 w-12 rounded bg-gray-200 dark:bg-gray-700"></div>
                   </div>
                 </div>
-                <div className="text-right space-y-1">
-                  <div className="w-20 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                  <div className="w-12 h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="space-y-1 text-right">
+                  <div className="h-4 w-20 rounded bg-gray-200 dark:bg-gray-700"></div>
+                  <div className="h-3 w-12 rounded bg-gray-200 dark:bg-gray-700"></div>
                 </div>
               </div>
             </div>
           ))}
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="card">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Top Movers</h3>
-        <TrendingUp className="w-5 h-5 text-primary-500" />
-      </div>
-      <div className="space-y-3">
-        {topMovers.map((token, index) => (
-          <div key={token.symbol} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                {token.symbol.charAt(0)}
+      ) : (
+        <div className="space-y-3">
+          {topMovers.map((coin) => {
+            const isPositive = (coin.price_change_percentage_24h ?? 0) >= 0;
+            return (
+              <div
+                key={coin.id}
+                className="flex items-center justify-between rounded-lg p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-xs font-bold text-white">
+                    {coin.symbol?.charAt(0)?.toUpperCase()}
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-900 dark:text-white">{coin.symbol?.toUpperCase()}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">{coin.name}</div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-medium text-gray-900 dark:text-white">
+                    ${coin.current_price?.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                  </div>
+                  <div
+                    className={`flex items-center justify-end space-x-1 text-sm ${
+                      isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                    }`}
+                  >
+                    {isPositive ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                    <span>
+                      {Math.abs(coin.price_change_percentage_24h ?? 0).toFixed(2)}%
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <div className="font-medium text-gray-900 dark:text-white">{token.symbol}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">{token.name}</div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="font-medium text-gray-900 dark:text-white">
-                ${token.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-              </div>
-              <div className={`flex items-center space-x-1 text-sm ${
-                token.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-              }`}>
-                {token.isPositive ? (
-                  <ArrowUpRight className="w-3 h-3" />
-                ) : (
-                  <ArrowDownRight className="w-3 h-3" />
-                )}
-                <span>{Math.abs(token.change24h).toFixed(1)}%</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
 
 export default TopMovers;
-

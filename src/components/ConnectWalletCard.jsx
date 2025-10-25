@@ -4,7 +4,7 @@ import { useWallet } from '../context/WalletContext';
 import WalletConnectModal from './WalletConnectModal';
 
 const ConnectWalletCard = () => {
-  const { isConnected } = useWallet();
+  const { isConnected, error } = useWallet();
   const [showWalletModal, setShowWalletModal] = useState(false);
 
   if (isConnected) {
@@ -13,7 +13,10 @@ const ConnectWalletCard = () => {
 
   return (
     <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border border-indigo-100 dark:border-indigo-800 rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300">
-      <div className="text-6xl mb-4">🔗</div>
+      {/* Replaced corrupted glyph with a proper wallet icon */}
+      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600/15 text-blue-600 dark:bg-blue-500/15">
+        <Wallet className="h-9 w-9" />
+      </div>
       <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">
         Connect Your Wallet
       </h2>
@@ -28,14 +31,15 @@ const ConnectWalletCard = () => {
         <span>Connect Wallet</span>
         <ArrowRight className="w-4 h-4" />
       </button>
-      
-      <div className="mt-6 text-sm text-gray-500 dark:text-gray-400">
-        <p>Supported wallets: MetaMask, WalletConnect, Coinbase Wallet, Phantom, Rainbow</p>
+      <div className="mt-6 space-y-2 text-sm text-gray-500 dark:text-gray-400">
+        <p>Supported today: MetaMask (more wallets coming soon).</p>
+        {error && (
+          <p className="text-sm text-red-500">{error}</p>
+        )}
       </div>
-      
-      <WalletConnectModal 
-        isOpen={showWalletModal} 
-        onClose={() => setShowWalletModal(false)} 
+      <WalletConnectModal
+        isOpen={showWalletModal}
+        onClose={() => setShowWalletModal(false)}
       />
     </div>
   );

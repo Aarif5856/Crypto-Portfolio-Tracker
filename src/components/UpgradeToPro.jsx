@@ -97,7 +97,7 @@ const UpgradeToPro = () => {
       </div>
 
       <div className="mt-4 text-xs text-white/70 text-center">
-        Cancel anytime • No setup fees • 30-day money-back guarantee
+        Cancel anytime | No setup fees | 30-day money-back guarantee
       </div>
 
       <StripeModal isOpen={isModalOpen} onClose={closeModal} />

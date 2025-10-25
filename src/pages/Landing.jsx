@@ -31,7 +31,7 @@ export default function Landing({ onNavigateToDashboard }) {
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 min-h-screen text-gray-100 font-inter">
+    <div className="bg-gradient-to-br from-[#0a0a0f] via-[#151528] to-[#1a1a2e] min-h-screen text-gray-100 font-inter">
       {/* Navbar */}
       <header className="flex justify-between items-center px-8 py-6">
         <h1 className="text-2xl font-bold text-white">CryptoPro</h1>
@@ -50,7 +50,7 @@ export default function Landing({ onNavigateToDashboard }) {
 
       {/* Hero Section */}
       <section className="text-center py-32 md:py-48 px-4 md:px-12">
-        <motion.h2
+        <motion.h2 data-testid="landing-hero-heading"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -97,27 +97,28 @@ export default function Landing({ onNavigateToDashboard }) {
       {/* Features Section */}
       <section id="features" className="py-20 px-6 bg-gray-900/40 backdrop-blur-lg">
         <h3 className="text-3xl font-bold text-center mb-12">Why Choose CryptoPro</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto px-4 md:px-10">
+        {/* Normalized marketing copy to remove corrupted glyphs */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto px-4 md:px-10">
           {[
             {
               icon: <Wallet size={36} />,
               title: "Multi-Wallet Sync",
-              desc: "Connect MetaMask or any wallet and track all your assets in one view.",
+              desc: "Connect MetaMask or any supported wallet and track every asset from a single dashboard.",
             },
             {
               icon: <LineChart size={36} />,
               title: "Live Market Data",
-              desc: "Real-time prices via CoinGecko API with smart refresh and caching.",
+              desc: "Real-time prices via CoinGecko with smart refresh intervals and caching.",
             },
             {
               icon: <Zap size={36} />,
               title: "Lightning Fast UI",
-              desc: "Built with React + Vite + Tailwind for instant response and modern look.",
+              desc: "React, Vite, and Tailwind power snappy interactions and modern visuals.",
             },
             {
               icon: <Shield size={36} />,
               title: "Secure & Private",
-              desc: "View-only wallet connections — we never store private keys or data.",
+              desc: "View-only wallet connections - we never store private keys or personal data.",
             },
           ].map((item, i) => (
             <motion.div
@@ -174,7 +175,10 @@ export default function Landing({ onNavigateToDashboard }) {
               <p className="text-4xl font-bold text-teal-400 mb-4">{plan.price}</p>
               <ul className="text-gray-400 mb-6 space-y-2">
                 {plan.features.map((f, idx) => (
-                  <li key={idx}>• {f}</li>
+                  <li key={idx} className="flex items-center gap-2 text-sm">
+                    <span className="h-1.5 w-1.5 rounded-full bg-teal-300" aria-hidden="true"></span>
+                    <span>{f}</span>
+                  </li>
                 ))}
               </ul>
               <button className="bg-teal-500 hover:bg-teal-400 text-black px-6 py-2 rounded-xl font-semibold transition">
@@ -192,7 +196,7 @@ export default function Landing({ onNavigateToDashboard }) {
           <details className="bg-gray-800/50 p-5 rounded-xl">
             <summary className="cursor-pointer font-semibold text-teal-400">Is my wallet data safe?</summary>
             <p className="text-gray-400 mt-2">
-              Absolutely. CryptoPro uses read-only wallet access — your private keys never leave your wallet.
+              Absolutely. CryptoPro uses read-only wallet access - your private keys never leave your wallet.
             </p>
           </details>
           <details className="bg-gray-800/50 p-5 rounded-xl">
@@ -210,10 +214,10 @@ export default function Landing({ onNavigateToDashboard }) {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="text-center py-10 bg-gray-950/80 border-t border-gray-800 text-gray-400">
-        © {new Date().getFullYear()} CryptoPro — All Rights Reserved —
-        <a href="https://github.com/Aarif5856" target="_blank" className="text-teal-400 hover:underline ml-1">
+        {/* Clean footer copy after removing corrupted characters */}
+        <span>&copy; {new Date().getFullYear()} CryptoPro - All Rights Reserved -</span>
+        <a href="https://github.com/Aarif5856" target="_blank" rel="noreferrer" className="text-teal-400 hover:underline ml-1">
           Built by Aarif
         </a>
       </footer>

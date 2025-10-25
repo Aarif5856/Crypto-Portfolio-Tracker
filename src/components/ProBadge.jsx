@@ -1,5 +1,5 @@
 import React from 'react';
-import { Crown, Star } from 'lucide-react';
+import { Crown } from 'lucide-react';
 
 const ProBadge = ({ isPro = false, showText = true }) => {
   if (!isPro) return null;
@@ -13,4 +13,3 @@ const ProBadge = ({ isPro = false, showText = true }) => {
 };
 
 export default ProBadge;
-

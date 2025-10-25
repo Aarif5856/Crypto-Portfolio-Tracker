@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { ethers } from 'ethers';
 
 const WalletContext = createContext();
@@ -11,6 +11,22 @@ export const useWallet = () => {
   return context;
 };
 
+const getNetworkName = (chainId) => {
+  const networks = {
+    1: 'Ethereum Mainnet',
+    3: 'Ropsten Testnet',
+    4: 'Rinkeby Testnet',
+    5: 'Goerli Testnet',
+    42: 'Kovan Testnet',
+    11155111: 'Sepolia Testnet',
+    137: 'Polygon Mainnet',
+    80001: 'Polygon Mumbai',
+    56: 'BSC Mainnet',
+    97: 'BSC Testnet',
+  };
+  return networks[chainId] || `Chain ${chainId}`;
+};
+
 export const WalletProvider = ({ children }) => {
   const [account, setAccount] = useState(null);
   const [provider, setProvider] = useState(null);
@@ -21,51 +37,7 @@ export const WalletProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [chainId, setChainId] = useState(null);
   const [networkName, setNetworkName] = useState('Unknown');
-
-  // Check if wallet is already connected
-  useEffect(() => {
-    const checkConnection = async () => {
-      if (window.ethereum) {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-          if (accounts.length > 0) {
-            await connectWallet();
-          }
-        } catch (err) {
-          console.error('Error checking wallet connection:', err);
-        }
-      }
-    };
-
-    checkConnection();
-  }, []);
-
-  // Listen for account changes
-  useEffect(() => {
-    if (window.ethereum) {
-      const handleAccountsChanged = (accounts) => {
-        if (accounts.length === 0) {
-          disconnectWallet();
-        } else {
-          setAccount(accounts[0]);
-        }
-      };
-
-      const handleChainChanged = () => {
-        window.location.reload();
-      };
-
-      window.ethereum.on('accountsChanged', handleAccountsChanged);
-      window.ethereum.on('chainChanged', handleChainChanged);
-
-      return () => {
-        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
-        window.ethereum.removeListener('chainChanged', handleChainChanged);
-      };
-    }
-  }, []);
-
-  const connectWallet = async () => {
+  const connectWallet = useCallback(async () => {
     if (!window.ethereum) {
       setError('Please install MetaMask or another Web3 wallet');
       return;
@@ -112,24 +84,51 @@ export const WalletProvider = ({ children }) => {
     } finally {
       setIsConnecting(false);
     }
-  };
+  }, []);
 
-  // Get network name from chain ID
-  const getNetworkName = (chainId) => {
-    const networks = {
-      1: 'Ethereum Mainnet',
-      3: 'Ropsten Testnet',
-      4: 'Rinkeby Testnet',
-      5: 'Goerli Testnet',
-      42: 'Kovan Testnet',
-      11155111: 'Sepolia Testnet',
-      137: 'Polygon Mainnet',
-      80001: 'Polygon Mumbai',
-      56: 'BSC Mainnet',
-      97: 'BSC Testnet',
+  // Check if wallet is already connected
+  useEffect(() => {
+    const checkConnection = async () => {
+      if (window.ethereum) {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+          if (accounts.length > 0) {
+            await connectWallet();
+          }
+        } catch (err) {
+          console.error('Error checking wallet connection:', err);
+        }
+      }
     };
-    return networks[chainId] || `Chain ${chainId}`;
-  };
+
+    checkConnection();
+  }, [connectWallet]);
+
+  // Listen for account changes
+  useEffect(() => {
+    if (window.ethereum) {
+      const handleAccountsChanged = (accounts) => {
+        if (accounts.length === 0) {
+          disconnectWallet();
+        } else {
+          setAccount(accounts[0]);
+        }
+      };
+
+      const handleChainChanged = () => {
+        window.location.reload();
+      };
+
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
+      window.ethereum.on('chainChanged', handleChainChanged);
+
+      return () => {
+        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+        window.ethereum.removeListener('chainChanged', handleChainChanged);
+      };
+    }
+  }, []);
+
 
   const disconnectWallet = () => {
     setAccount(null);

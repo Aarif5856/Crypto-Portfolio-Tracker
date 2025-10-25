@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+const STORAGE_KEY = 'crypto-pro-tutorial-completed';
 const OnboardingContext = createContext();
 
 export const useOnboarding = () => {
@@ -15,16 +16,20 @@ export const OnboardingProvider = ({ children }) => {
   const [hasSeenTutorial, setHasSeenTutorial] = useState(false);
 
   useEffect(() => {
-    // Check if user has seen the tutorial before
-    const tutorialCompleted = localStorage.getItem('crypto-pro-tutorial-completed');
-    setHasSeenTutorial(!!tutorialCompleted);
-    
-    // For demo purposes, skip tutorial by default
-    // Users can still access it via the help button
-    if (!tutorialCompleted) {
-      localStorage.setItem('crypto-pro-tutorial-completed', 'true');
-      setHasSeenTutorial(true);
+    // Ensure the tutorial opens once for first-time visitors only
+    let timer;
+    if (typeof window !== 'undefined') {
+      const tutorialCompleted = localStorage.getItem(STORAGE_KEY) === 'true';
+      setHasSeenTutorial(tutorialCompleted);
+      if (!tutorialCompleted) {
+        timer = window.setTimeout(() => setShowTutorial(true), 600);
+      }
     }
+    return () => {
+      if (timer) {
+        window.clearTimeout(timer);
+      }
+    };
   }, []);
 
   const startTutorial = () => {
@@ -35,15 +40,30 @@ export const OnboardingProvider = ({ children }) => {
     setShowTutorial(false);
   };
 
+  const markTutorialCompleted = () => {
+    // Persist tutorial completion once the user finishes or dismisses it
+    localStorage.setItem(STORAGE_KEY, 'true');
+    setHasSeenTutorial(true);
+    setShowTutorial(false);
+  };
+
+  const skipTutorial = () => {
+    markTutorialCompleted();
+  };
+
+  const completeTutorial = () => {
+    markTutorialCompleted();
+  };
+
   const resetTutorial = () => {
-    localStorage.removeItem('crypto-pro-tutorial-completed');
+    localStorage.removeItem(STORAGE_KEY);
     setHasSeenTutorial(false);
     setShowTutorial(false);
   };
 
-  // Add global function for debugging
+  // Expose reset helper in dev builds for easier QA
   useEffect(() => {
-    if (import.meta.env && import.meta.env.DEV) {
+    if (import.meta.env?.DEV) {
       window.clearTutorial = resetTutorial;
     }
   }, []);
@@ -53,7 +73,9 @@ export const OnboardingProvider = ({ children }) => {
     hasSeenTutorial,
     startTutorial,
     closeTutorial,
-    resetTutorial
+    skipTutorial,
+    completeTutorial,
+    resetTutorial,
   };
 
   return (

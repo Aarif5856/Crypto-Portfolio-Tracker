@@ -1,142 +1,220 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Star, Trash2, Eye } from 'lucide-react';
-import { getMultipleTokenPrices } from '../utils/coingecko';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Plus, Star, Trash2, Eye, RefreshCw } from 'lucide-react';
+import { getCoinMarketData, searchCoinByQuery } from '../utils/coingecko';
+
+const WATCHLIST_STORAGE_KEY = 'crypto-watchlist';
+const WATCHLIST_PRICE_KEY = 'crypto-watchlist-prices';
 
 const Watchlist = () => {
   const [watchlist, setWatchlist] = useState([]);
   const [prices, setPrices] = useState({});
+  const [lastUpdated, setLastUpdated] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newToken, setNewToken] = useState('');
+  const [feedback, setFeedback] = useState(null);
+  const [error, setError] = useState(null);
 
-  // Load watchlist from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('crypto-watchlist');
+    if (typeof window === 'undefined') return;
+    const saved = localStorage.getItem(WATCHLIST_STORAGE_KEY);
     if (saved) {
-      setWatchlist(JSON.parse(saved));
+      try {
+        setWatchlist(JSON.parse(saved));
+      } catch {
+        setWatchlist([]);
+      }
+    }
+    const cached = localStorage.getItem(WATCHLIST_PRICE_KEY);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        setPrices(parsed.prices || {});
+        setLastUpdated(parsed.updatedAt || null);
+      } catch {
+        setPrices({});
+      }
     }
   }, []);
 
-  // Save watchlist to localStorage
   useEffect(() => {
-    localStorage.setItem('crypto-watchlist', JSON.stringify(watchlist));
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(WATCHLIST_STORAGE_KEY, JSON.stringify(watchlist));
   }, [watchlist]);
 
-  // Fetch prices for watchlist tokens
+  const fetchPrices = useCallback(async () => {
+    if (watchlist.length === 0) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const ids = watchlist.map((token) => token.id);
+      const marketData = await getCoinMarketData(ids);
+      const priceMap = {};
+      marketData.forEach((coin) => {
+        priceMap[coin.id] = coin;
+      });
+      setPrices(priceMap);
+      const timestamp = Date.now();
+      setLastUpdated(timestamp);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(
+          WATCHLIST_PRICE_KEY,
+          JSON.stringify({ updatedAt: timestamp, prices: priceMap })
+        );
+      }
+    } catch (err) {
+      console.error('Error fetching watchlist prices:', err);
+      setError('Unable to refresh prices. Showing the last saved values.');
+    } finally {
+      setLoading(false);
+    }
+  }, [watchlist]);
+
   useEffect(() => {
     if (watchlist.length === 0) return;
+    let isMounted = true;
 
-    const fetchPrices = async () => {
-      setLoading(true);
-      try {
-        // Use fallback data since we're not making real API calls
-        const fallbackPrices = {};
-        watchlist.forEach(token => {
-          fallbackPrices[token.id] = {
-            current_price: Math.random() * 1000 + 10,
-            price_change_percentage_24h: (Math.random() - 0.5) * 20
-          };
-        });
-        setPrices(fallbackPrices);
-      } catch (error) {
-        console.error('Error fetching watchlist prices:', error);
-      } finally {
-        setLoading(false);
-      }
+    const refresh = async () => {
+      if (!isMounted) return;
+      await fetchPrices();
     };
 
-    fetchPrices();
-    const interval = setInterval(fetchPrices, 30000); // Update every 30 seconds
-    return () => clearInterval(interval);
-  }, [watchlist]);
+    refresh();
+    const interval = window.setInterval(refresh, 30000);
+    return () => {
+      isMounted = false;
+      window.clearInterval(interval);
+    };
+  }, [fetchPrices, watchlist.length]);
 
-  const addToWatchlist = () => {
+  const addToWatchlist = async () => {
     if (!newToken.trim()) return;
-
-    const tokenId = newToken.toLowerCase().trim();
-    const tokenSymbol = tokenId.toUpperCase();
-    
-    // Check if already in watchlist
-    if (watchlist.some(token => token.id === tokenId)) {
-      alert('Token already in watchlist!');
-      return;
+    setFeedback(null);
+    setIsAdding(true);
+    try {
+      const searchResult = await searchCoinByQuery(newToken.trim());
+      if (!searchResult) {
+        setFeedback('Token not found. Try a full name such as "Bitcoin" or symbol "BTC".');
+        return;
+      }
+      const exists = watchlist.some((token) => token.id === searchResult.id);
+      if (exists) {
+        setFeedback('Token already in watchlist.');
+        return;
+      }
+      const newEntry = {
+        id: searchResult.id,
+        symbol: searchResult.symbol.toUpperCase(),
+        name: searchResult.name,
+        addedAt: new Date().toISOString(),
+      };
+      setWatchlist((prev) => [...prev, newEntry]);
+      setNewToken('');
+      setShowAddForm(false);
+      setFeedback(null);
+    } catch (err) {
+      console.error('Error adding token to watchlist:', err);
+      setFeedback('Unable to add token right now. Please try again.');
+    } finally {
+      setIsAdding(false);
     }
-
-    const newTokenObj = {
-      id: tokenId,
-      symbol: tokenSymbol,
-      name: tokenSymbol,
-      addedAt: new Date().toISOString()
-    };
-
-    setWatchlist(prev => [...prev, newTokenObj]);
-    setNewToken('');
-    setShowAddForm(false);
   };
 
   const removeFromWatchlist = (tokenId) => {
-    setWatchlist(prev => prev.filter(token => token.id !== tokenId));
+    setWatchlist((prev) => prev.filter((token) => token.id !== tokenId));
+    setPrices((prev) => {
+      const next = { ...prev };
+      delete next[tokenId];
+      return next;
+    });
   };
 
   const formatPrice = (price) => {
+    if (price === undefined || price === null) return 'N/A';
     if (price < 0.01) return `$${price.toFixed(6)}`;
     if (price < 1) return `$${price.toFixed(4)}`;
     return `$${price.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
   };
 
+  const formatChange = (value) => {
+    if (value === undefined || value === null) return 'N/A';
+    return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
+  };
+
   return (
     <div className="card">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center space-x-2">
-          <Star className="w-5 h-5 text-yellow-500" />
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="flex items-center space-x-2 text-lg font-semibold text-gray-900 dark:text-white">
+          <Star className="h-5 w-5 text-yellow-500" />
           <span>My Watchlist</span>
         </h3>
         <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="p-2 text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+          onClick={() => setShowAddForm((prev) => !prev)}
+          className="rounded-lg p-2 text-primary-500 transition-colors hover:bg-primary-50 dark:hover:bg-primary-900/20"
+          aria-label="Add token to watchlist"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="h-4 w-4" />
         </button>
       </div>
 
       {showAddForm && (
-        <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <div className="mb-4 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
           <div className="flex space-x-2">
             <input
               type="text"
-              placeholder="Enter token symbol (e.g., BTC, ETH)"
+              placeholder="Search token name or symbol (e.g., BTC)"
               value={newToken}
               onChange={(e) => setNewToken(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              onKeyPress={(e) => e.key === 'Enter' && addToWatchlist()}
+              className="input flex-1"
+              onKeyDown={(e) => e.key === 'Enter' && addToWatchlist()}
+              disabled={isAdding}
             />
             <button
               onClick={addToWatchlist}
-              className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+              disabled={isAdding}
+              className="btn-primary flex items-center space-x-2"
             >
-              Add
+              {isAdding && <RefreshCw className="h-4 w-4 animate-spin" />}
+              <span>Add</span>
             </button>
           </div>
+          {feedback && <p className="mt-2 text-sm text-red-500">{feedback}</p>}
         </div>
       )}
 
+      {error && (
+        <div className="mb-4 rounded-lg border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-700 dark:border-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200">
+          {error}
+        </div>
+      )}
+
+      {lastUpdated && watchlist.length > 0 && (
+        <p className="mb-3 text-xs text-gray-500 dark:text-gray-400">
+          Last updated {new Date(lastUpdated).toLocaleTimeString()}
+        </p>
+      )}
+
       {watchlist.length === 0 ? (
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-          <Eye className="w-12 h-12 mx-auto mb-3 opacity-50" />
+        <div className="py-8 text-center text-gray-500 dark:text-gray-400">
+          <Eye className="mx-auto mb-3 h-12 w-12 opacity-50" />
           <p>No tokens in watchlist</p>
-          <p className="text-sm">Add tokens to track their prices</p>
+          <p className="text-sm">Add a token to start tracking live prices.</p>
         </div>
       ) : (
         <div className="space-y-2">
           {watchlist.map((token) => {
             const priceData = prices[token.id];
-            const change24h = priceData?.price_change_percentage_24h || 0;
-            const isPositive = change24h > 0;
+            const change24h = priceData?.price_change_percentage_24h ?? 0;
+            const isPositive = change24h >= 0;
 
             return (
-              <div key={token.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group">
+              <div
+                key={token.id}
+                className="group flex items-center justify-between rounded-lg p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-xs font-bold text-white">
                     {token.symbol.charAt(0)}
                   </div>
                   <div>
@@ -144,31 +222,36 @@ const Watchlist = () => {
                     <div className="text-sm text-gray-600 dark:text-gray-400">{token.name}</div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-3">
                   <div className="text-right">
                     {loading ? (
                       <div className="animate-pulse">
-                        <div className="w-16 h-4 bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
-                        <div className="w-12 h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                        <div className="mb-1 h-4 w-16 rounded bg-gray-200 dark:bg-gray-700"></div>
+                        <div className="h-3 w-12 rounded bg-gray-200 dark:bg-gray-700"></div>
                       </div>
                     ) : (
                       <>
                         <div className="font-medium text-gray-900 dark:text-white">
-                          {priceData ? formatPrice(priceData.current_price) : 'Loading...'}
+                          {formatPrice(priceData?.current_price)}
                         </div>
-                        <div className={`text-sm ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                          {priceData ? `${isPositive ? '+' : ''}${change24h.toFixed(2)}%` : ''}
+                        <div
+                          className={`text-sm ${
+                            isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                          }`}
+                        >
+                          {formatChange(change24h)}
                         </div>
                       </>
                     )}
                   </div>
-                  
+
                   <button
                     onClick={() => removeFromWatchlist(token.id)}
-                    className="p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                    className="opacity-0 transition-opacity group-hover:opacity-100"
+                    aria-label={`Remove ${token.name} from watchlist`}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="h-4 w-4 text-gray-400 hover:text-red-500" />
                   </button>
                 </div>
               </div>
@@ -181,4 +264,3 @@ const Watchlist = () => {
 };
 
 export default Watchlist;
-

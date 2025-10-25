@@ -12,10 +12,13 @@ import MobileBottomNav from '../components/MobileBottomNav';
 import ConnectWalletCard from '../components/ConnectWalletCard';
 import { useWallet } from '../context/WalletContext';
 import { useOnboarding } from '../context/OnboardingContext';
+import { usePortfolioData } from '../hooks/usePortfolioData';
 
 const Dashboard = ({ onNavigateToLanding }) => {
   const { isConnected } = useWallet();
   const { hasSeenTutorial, startTutorial } = useOnboarding();
+  // Share one portfolio query instance across dashboard widgets
+  const portfolioQuery = usePortfolioData();
 
   // Show tutorial for first-time users
   useEffect(() => {
@@ -28,7 +31,7 @@ const Dashboard = ({ onNavigateToLanding }) => {
   }, [hasSeenTutorial, startTutorial]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0f]">
       <Header onNavigateToLanding={onNavigateToLanding} />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 pb-20 md:pb-8">
@@ -57,14 +60,14 @@ const Dashboard = ({ onNavigateToLanding }) => {
           <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
             {/* Main Portfolio - Takes 2 columns on XL screens */}
             <div className="xl:col-span-2" id="portfolio">
-              <PortfolioOverview />
+              <PortfolioOverview portfolioQuery={portfolioQuery} />
             </div>
 
             {/* Pro Widgets - Takes 2 columns on XL screens */}
             <div className="xl:col-span-2 space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <TopMovers />
-                <PortfolioRiskScore portfolioValue={0} tokenBalances={[]} />
+                <PortfolioRiskScore portfolioQuery={portfolioQuery} />
               </div>
               <div id="watchlist">
                 <Watchlist />

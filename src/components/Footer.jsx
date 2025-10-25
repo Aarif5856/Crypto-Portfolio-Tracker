@@ -10,8 +10,9 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
           <div className="flex items-center space-x-1">
-            <span>© {currentYear} CryptoPro</span>
-            <span>—</span>
+            {/* Clean footer copy after removing corrupted glyphs */}
+            <span>&copy; {currentYear} CryptoPro</span>
+            <span>-</span>
             <span>Powered by Web3</span>
           </div>
           <div className="flex items-center space-x-4">

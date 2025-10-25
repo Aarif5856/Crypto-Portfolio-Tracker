@@ -6,7 +6,11 @@ import { useOnboarding } from '../context/OnboardingContext';
 const OnboardingTutorial = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const { isConnected } = useWallet();
-  const { showTutorial, closeTutorial } = useOnboarding();
+  const {
+    showTutorial,
+    skipTutorial: dismissTutorial,
+    completeTutorial: finishTutorial,
+  } = useOnboarding();
 
   const steps = [
     {
@@ -68,21 +72,47 @@ const OnboardingTutorial = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
               <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Portfolio Overview</h4>
+              {/* Rebuilt bullet list to avoid encoding issues */}
               <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                <li>• Total portfolio value in USD</li>
-                <li>• Individual token balances</li>
-                <li>• Real-time price updates</li>
-                <li>• 24h change tracking</li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true"></span>
+                  <span>Total portfolio value in USD</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true"></span>
+                  <span>Individual token balances</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true"></span>
+                  <span>Real-time price updates</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true"></span>
+                  <span>24h change tracking</span>
+                </li>
               </ul>
-            </div>
             <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
               <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Pro Features</h4>
+              {/* Rebuilt bullet list to avoid encoding issues */}
               <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                <li>• Top Movers widget</li>
-                <li>• Personal watchlist</li>
-                <li>• Risk score analysis</li>
-                <li>• Advanced analytics</li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true"></span>
+                  <span>Top Movers widget</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true"></span>
+                  <span>Personal watchlist</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true"></span>
+                  <span>Risk score analysis</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true"></span>
+                  <span>Advanced analytics</span>
+                </li>
               </ul>
+            </div>
             </div>
           </div>
         </div>
@@ -140,9 +170,20 @@ const OnboardingTutorial = () => {
             </p>
           </div>
           <div className="flex justify-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-            <span>• Connect wallet</span>
-            <span>• View portfolio</span>
-            <span>• Upgrade to Pro</span>
+            <div className="flex justify-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+              <span className="flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true"></span>
+                <span>Connect wallet</span>
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true"></span>
+                <span>View portfolio</span>
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true"></span>
+                <span>Upgrade to Pro</span>
+              </span>
+            </div>
           </div>
         </div>
       )
@@ -155,9 +196,9 @@ const OnboardingTutorial = () => {
 
   const nextStep = () => {
     if (isLastStep) {
-      closeTutorial();
+      handleCompleteTutorial();
     } else {
-      setCurrentStep(prev => prev + 1);
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
@@ -167,16 +208,16 @@ const OnboardingTutorial = () => {
     }
   };
 
-  const skipTutorial = () => {
-    localStorage.setItem('crypto-pro-tutorial-completed', 'true');
-    setCurrentStep(0); // Reset to first step
-    closeTutorial();
+  const handleSkipTutorial = () => {
+    // Keep tutorial progress state in sync with context
+    setCurrentStep(0);
+    dismissTutorial();
   };
 
-  const completeTutorial = () => {
-    localStorage.setItem('crypto-pro-tutorial-completed', 'true');
-    setCurrentStep(0); // Reset to first step
-    closeTutorial();
+  const handleCompleteTutorial = () => {
+    // Mark tutorial as completed once the final step is confirmed
+    setCurrentStep(0);
+    finishTutorial();
   };
 
   // Auto-advance from wallet connection step when wallet is connected
@@ -194,11 +235,11 @@ const OnboardingTutorial = () => {
   return (
     <div 
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          skipTutorial();
-        }
-      }}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            handleSkipTutorial();
+          }
+        }}
     >
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
@@ -215,7 +256,7 @@ const OnboardingTutorial = () => {
             </div>
           </div>
           <button
-            onClick={skipTutorial}
+            onClick={handleSkipTutorial}
             className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <X className="w-5 h-5" />
@@ -276,7 +317,7 @@ const OnboardingTutorial = () => {
           </div>
 
           <button
-            onClick={isLastStep ? completeTutorial : nextStep}
+            onClick={isLastStep ? handleCompleteTutorial : nextStep}
             className="btn-primary flex items-center space-x-2"
           >
             <span>{isLastStep ? 'Get Started' : 'Next'}</span>
@@ -289,4 +330,3 @@ const OnboardingTutorial = () => {
 };
 
 export default OnboardingTutorial;
-

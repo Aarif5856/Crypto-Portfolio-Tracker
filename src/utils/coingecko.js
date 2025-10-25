@@ -243,3 +243,47 @@ export const getGlobalMarketData = async () => {
     throw error;
   }
 };
+
+// Lightweight coin search used by the watchlist to map symbols to CoinGecko IDs
+export const searchCoinByQuery = async (query) => {
+  if (!query) return null;
+  try {
+    const response = await coingeckoAPI.get('/search', {
+      params: { query },
+    });
+    const firstMatch = response.data?.coins?.[0]?.item;
+    if (!firstMatch) {
+      return null;
+    }
+    return {
+      id: firstMatch.id,
+      symbol: firstMatch.symbol,
+      name: firstMatch.name,
+    };
+  } catch (error) {
+    console.error('Error searching CoinGecko:', error);
+    throw error;
+  }
+};
+
+// Fetch market data (price, change, volume) for a set of CoinGecko IDs
+export const getCoinMarketData = async (ids = [], vsCurrency = 'usd') => {
+  if (!ids.length) {
+    return [];
+  }
+
+  try {
+    const response = await coingeckoAPI.get('/coins/markets', {
+      params: {
+        ids: ids.join(','),
+        vs_currency: vsCurrency,
+        price_change_percentage: '24h',
+        order: 'market_cap_desc',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching coin market data:', error);
+    throw error;
+  }
+};

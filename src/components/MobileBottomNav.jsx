@@ -1,11 +1,9 @@
 import React from 'react';
-import { Wallet, BarChart3, Star, Settings, Home } from 'lucide-react';
+import { Wallet, BarChart3, Star, Home } from 'lucide-react';
 import { useWallet } from '../context/WalletContext';
-import { useOnboarding } from '../context/OnboardingContext';
 
 const MobileBottomNav = () => {
-  const { isConnected, account } = useWallet();
-  const { startTutorial } = useOnboarding();
+  const { isConnected } = useWallet();
 
   const navItems = [
     {
@@ -67,7 +65,7 @@ const MobileBottomNav = () => {
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = item.active;
-          const isConnected = item.connected;
+          const isItemConnected = item.connected;
           
           return (
             <button
@@ -81,7 +79,7 @@ const MobileBottomNav = () => {
             >
               <div className="relative">
                 <Icon className={`w-5 h-5 ${isActive ? 'text-primary-600 dark:text-primary-400' : ''}`} />
-                {isConnected && (
+                {isItemConnected && (
                   <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"></div>
                 )}
               </div>
