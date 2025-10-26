@@ -177,6 +177,8 @@ export const setupMockCoinGecko = async (page) => {
     return marketData[id];
   };
 
+  const corsHeaders = { 'Access-Control-Allow-Origin': '*' };
+
   await page.route('https://api.coingecko.com/api/v3/*', async (route, request) => {
     const url = new URL(request.url());
     const { pathname, searchParams } = url;
@@ -190,6 +192,7 @@ export const setupMockCoinGecko = async (page) => {
       }, {});
       await route.fulfill({
         status: 200,
+        headers: corsHeaders,
         contentType: 'application/json',
         body: JSON.stringify(body),
       });
@@ -204,6 +207,7 @@ export const setupMockCoinGecko = async (page) => {
       }));
       await route.fulfill({
         status: 200,
+        headers: corsHeaders,
         contentType: 'application/json',
         body: JSON.stringify(response),
       });
@@ -213,6 +217,7 @@ export const setupMockCoinGecko = async (page) => {
     if (pathname === '/api/v3/global') {
       await route.fulfill({
         status: 200,
+        headers: corsHeaders,
         contentType: 'application/json',
         body: JSON.stringify({
           data: {
@@ -243,6 +248,7 @@ export const setupMockCoinGecko = async (page) => {
 
       await route.fulfill({
         status: 200,
+        headers: corsHeaders,
         contentType: 'application/json',
         body: JSON.stringify({ coins: matches }),
       });
@@ -265,6 +271,7 @@ export const setupMockCoinGecko = async (page) => {
 
       await route.fulfill({
         status: 200,
+        headers: corsHeaders,
         contentType: 'application/json',
         body: JSON.stringify({ coins }),
       });
@@ -273,6 +280,7 @@ export const setupMockCoinGecko = async (page) => {
 
     await route.fulfill({
       status: 200,
+      headers: corsHeaders,
       contentType: 'application/json',
       body: JSON.stringify({}),
     });

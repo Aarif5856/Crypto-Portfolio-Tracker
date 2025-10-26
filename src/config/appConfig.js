@@ -37,9 +37,10 @@ export const appConfig = {
 
   // Analytics & CRM hooks
   analytics: {
-    enableVercelAnalytics: true,
-    crmWebhookUrl: "", // Optional: add your CRM ingestion endpoint
-  },
+  enableVercelAnalytics: true,
+  crmWebhookUrl: "", // Disabled: no CRM endpoint configured
+},
+
   
   // API Configuration
   api: {

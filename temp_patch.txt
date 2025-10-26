@@ -1,0 +1,133 @@
+*** Update File: tests/utils/mockApi.js
+@@
+-  const ensureMarketEntry = (id) => {
+-    if (!marketData[id]) {
+-      const synthetic = syntheticForId(id);
+-      marketData[id] = {
+-        id: synthetic.id,
+-        symbol: synthetic.symbol,
+-        name: synthetic.name,
+-        current_price: synthetic.current_price,
+-        price_change_percentage_24h: synthetic.price_change_percentage_24h,
+-      };
+-    }
+-    return marketData[id];
+-  };
+-
+-  const corsHeaders = { "Access-Control-Allow-Origin": "*" };`n`n  await page.route('https://api.coingecko.com/api/v3/*', async (route, request) => {
++  const ensureMarketEntry = (id) => {
++    if (!marketData[id]) {
++      const synthetic = syntheticForId(id);
++      marketData[id] = {
++        id: synthetic.id,
++        symbol: synthetic.symbol,
++        name: synthetic.name,
++        current_price: synthetic.current_price,
++        price_change_percentage_24h: synthetic.price_change_percentage_24h,
++      };
++    }
++    return marketData[id];
++  };
++
++  const corsHeaders = { 'Access-Control-Allow-Origin': '*' };
++
++  await page.route('https://api.coingecko.com/api/v3/*', async (route, request) => {
+@@
+-      await route.fulfill({
+-        status: 200,
+-        contentType: 'application/json',
+-        body: JSON.stringify(body),
+-      });
++      await route.fulfill({
++        status: 200,
++        headers: corsHeaders,
++        contentType: 'application/json',
++        body: JSON.stringify(body),
++      });
+       return;
+     }
+@@
+-      await route.fulfill({
+-        status: 200,
+-        contentType: 'application/json',
+-        body: JSON.stringify(response),
+-      });
++      await route.fulfill({
++        status: 200,
++        headers: corsHeaders,
++        contentType: 'application/json',
++        body: JSON.stringify(response),
++      });
+       return;
+     }
+@@
+-      await route.fulfill({
+-        status: 200,
+-        contentType: 'application/json',
+-        body: JSON.stringify({
+-          data: {
+-            total_market_cap: { usd: 1200000000 },
+-            total_volume: { usd: 450000000 },
+-            active_cryptocurrencies: 9500,
+-            market_cap_change_percentage_24h_usd: 2.2,
+-          },
+-        }),
+-      });
++      await route.fulfill({
++        status: 200,
++        headers: corsHeaders,
++        contentType: 'application/json',
++        body: JSON.stringify({
++          data: {
++            total_market_cap: { usd: 1200000000 },
++            total_volume: { usd: 450000000 },
++            active_cryptocurrencies: 9500,
++            market_cap_change_percentage_24h_usd: 2.2,
++          },
++        }),
++      });
+       return;
+     }
+@@
+-      await route.fulfill({
+-        status: 200,
+-        contentType: 'application/json',
+-        body: JSON.stringify({ coins: matches }),
+-      });
++      await route.fulfill({
++        status: 200,
++        headers: corsHeaders,
++        contentType: 'application/json',
++        body: JSON.stringify({ coins: matches }),
++      });
+       return;
+     }
+@@
+-      await route.fulfill({
+-        status: 200,
+-        contentType: 'application/json',
+-        body: JSON.stringify({ coins }),
+-      });
++      await route.fulfill({
++        status: 200,
++        headers: corsHeaders,
++        contentType: 'application/json',
++        body: JSON.stringify({ coins }),
++      });
+       return;
+     }
+ 
+-    await route.fulfill({
+-      status: 200,
+-      contentType: 'application/json',
+-      body: JSON.stringify({}),
+-    });
++    await route.fulfill({
++      status: 200,
++      headers: corsHeaders,
++      contentType: 'application/json',
++      body: JSON.stringify({}),
++    });
+   });
+ };
+*** End Patch

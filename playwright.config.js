@@ -11,12 +11,25 @@ export default defineConfig({
     trace: 'on-first-retry',
     headless: true,
   },
+
+  // 👇 add both desktop and mobile viewports
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'Desktop Chrome',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+      },
+    },
+    {
+      name: 'Mobile Chrome',
+      use: {
+        ...devices['Pixel 5'],
+        viewport: { width: 393, height: 851 }, // iPhone/Android typical
+      },
     },
   ],
+
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {
