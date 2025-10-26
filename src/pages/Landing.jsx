@@ -181,7 +181,24 @@ export default function Landing({ onNavigateToDashboard }) {
                   </li>
                 ))}
               </ul>
-              <button className="bg-teal-500 hover:bg-teal-400 text-black px-6 py-2 rounded-xl font-semibold transition">
+              <button
+                className="bg-teal-500 hover:bg-teal-400 text-black px-6 py-2 rounded-xl font-semibold transition"
+                onClick={() => {
+                  if (plan.title === "Free Plan") {
+                    onNavigateToDashboard();
+                    return;
+                  }
+                  if (plan.title === "Pro Plan") {
+                    window.dispatchEvent(new CustomEvent('open-upgrade-modal'));
+                    const upgradeSection = document.getElementById('upgrade-section');
+                    if (upgradeSection) {
+                      upgradeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    return;
+                  }
+                  window.location.href = "mailto:sales@coinvision.app?subject=CryptoPro%20White-label%20Request";
+                }}
+              >
                 {plan.button}
               </button>
             </motion.div>
