@@ -34,6 +34,12 @@ export const appConfig = {
     proPrice: "$9.99/month",
     stripePublishableKey: "", // Add your Stripe key
   },
+
+  // Analytics & CRM hooks
+  analytics: {
+    enableVercelAnalytics: true,
+    crmWebhookUrl: "", // Optional: add your CRM ingestion endpoint
+  },
   
   // API Configuration
   api: {

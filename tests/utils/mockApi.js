@@ -133,6 +133,50 @@ export const setupMockCoinGecko = async (page) => {
     },
   };
 
+  const syntheticForId = (id) => {
+    const seed = Array.from(id).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const basePrice = (seed % 5000) / 100 + 1;
+    const change = ((seed % 200) - 100) / 10;
+    return {
+      id,
+      symbol: id.slice(0, 3).toLowerCase(),
+      name: id.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) || 'Synthetic Asset',
+      current_price: Number(basePrice.toFixed(2)),
+      price_change_percentage_24h: Number(change.toFixed(2)),
+      usd: Number(basePrice.toFixed(2)),
+      usd_24h_change: Number(change.toFixed(2)),
+      usd_24h_vol: 1000000,
+      usd_market_cap: 5000000 + seed * 1000,
+    };
+  };
+
+  const ensurePrice = (id) => {
+    if (!pricePayload[id]) {
+      const synthetic = syntheticForId(id);
+      pricePayload[id] = {
+        usd: synthetic.usd,
+        usd_24h_change: synthetic.usd_24h_change,
+        usd_24h_vol: synthetic.usd_24h_vol,
+        usd_market_cap: synthetic.usd_market_cap,
+      };
+    }
+    return pricePayload[id];
+  };
+
+  const ensureMarketEntry = (id) => {
+    if (!marketData[id]) {
+      const synthetic = syntheticForId(id);
+      marketData[id] = {
+        id: synthetic.id,
+        symbol: synthetic.symbol,
+        name: synthetic.name,
+        current_price: synthetic.current_price,
+        price_change_percentage_24h: synthetic.price_change_percentage_24h,
+      };
+    }
+    return marketData[id];
+  };
+
   await page.route('https://api.coingecko.com/api/v3/*', async (route, request) => {
     const url = new URL(request.url());
     const { pathname, searchParams } = url;
@@ -141,10 +185,7 @@ export const setupMockCoinGecko = async (page) => {
       const idsParam = searchParams.get('ids') || '';
       const ids = idsParam.split(',').filter(Boolean);
       const body = ids.reduce((acc, id) => {
-        const data = pricePayload[id];
-        if (data) {
-          acc[id] = data;
-        }
+        acc[id] = ensurePrice(id);
         return acc;
       }, {});
       await route.fulfill({
@@ -159,7 +200,7 @@ export const setupMockCoinGecko = async (page) => {
       const idsParam = searchParams.get('ids') || '';
       const ids = idsParam.split(',').filter(Boolean);
       const response = ids.map((id) => ({
-        ...(marketData[id] || marketData.ethereum),
+        ...ensureMarketEntry(id),
       }));
       await route.fulfill({
         status: 200,
@@ -187,7 +228,8 @@ export const setupMockCoinGecko = async (page) => {
 
     if (pathname === '/api/v3/search') {
       const query = (searchParams.get('query') || '').toLowerCase();
-      const matches = Object.values(marketData)
+      const matches = Object.keys(marketData)
+        .map((id) => ensureMarketEntry(id))
         .filter((coin) => coin.name.toLowerCase().includes(query) || coin.symbol.toLowerCase().includes(query))
         .map((coin) => ({
           item: {
@@ -208,10 +250,10 @@ export const setupMockCoinGecko = async (page) => {
     }
 
     if (pathname === '/api/v3/search/trending') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ coins: Object.values(marketData).slice(0, 5).map((coin, index) => ({
+      const coins = Object.keys(marketData)
+        .map((id, index) => ({ coin: ensureMarketEntry(id), index }))
+        .slice(0, 5)
+        .map(({ coin, index }) => ({
           item: {
             id: coin.id,
             name: coin.name,
@@ -219,7 +261,12 @@ export const setupMockCoinGecko = async (page) => {
             thumb: 'https://assets.coingecko.com/coins/images/1/thumb/bitcoin.png',
             market_cap_rank: index + 1,
           },
-        })) }),
+        }));
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ coins }),
       });
       return;
     }

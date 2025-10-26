@@ -16,11 +16,14 @@ test('CryptoPro landing and dashboard smoke test', async ({ page }) => {
   await expect(
     page.getByRole('heading', { name: /Track & Grow Your Crypto Portfolio/i })
   ).toBeVisible();
+  await page.locator('#pricing').scrollIntoViewIfNeeded();
+  await expect(page.locator('section#pricing')).toHaveScreenshot('pricing-section.png', { animations: 'disabled' });
 
   await page.getByRole('button', { name: /Live Demo/i }).click();
   await expect(
     page.getByRole('heading', { name: /Welcome to Your Portfolio/i })
   ).toBeVisible();
+  await expect(page.locator('main')).toHaveScreenshot('dashboard-logged-out.png', { animations: 'disabled' });
 
   const promoButton = page.getByRole('button', { name: /^Connect Wallet$/i }).last();
   await promoButton.click();

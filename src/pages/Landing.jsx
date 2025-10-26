@@ -11,6 +11,7 @@ import {
   Tooltip,
   Filler,
 } from "chart.js";
+import { trackPricingClick } from "../utils/analytics";
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Filler);
 
@@ -185,6 +186,7 @@ export default function Landing({ onNavigateToDashboard }) {
               <button
                 className="bg-teal-500 hover:bg-teal-400 text-black px-6 py-2 rounded-xl font-semibold transition"
                 onClick={() => {
+                  trackPricingClick(plan.title, 'landing-pricing');
                   if (plan.title === "Free Plan") {
                     onNavigateToDashboard();
                     return;
