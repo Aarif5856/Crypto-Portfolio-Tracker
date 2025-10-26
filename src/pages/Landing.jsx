@@ -9,9 +9,10 @@ import {
   LinearScale,
   PointElement,
   Tooltip,
+  Filler,
 } from "chart.js";
 
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip);
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Filler);
 
 export default function Landing({ onNavigateToDashboard }) {
   const chartData = {
