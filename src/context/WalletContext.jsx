@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { ethers } from 'ethers';
+import { appConfig } from '../config/appConfig';
+import { addWalletAddress, getWallets as loadWallets, removeWalletAddress as removeWalletAddr } from '../lib/wallet';
 
 const WalletContext = createContext();
 
@@ -29,6 +31,7 @@ const getNetworkName = (chainId) => {
 
 export const WalletProvider = ({ children }) => {
   const [account, setAccount] = useState(null);
+  const [activeAccount, setActiveAccount] = useState(null);
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
   const [balance, setBalance] = useState('0');
@@ -37,6 +40,32 @@ export const WalletProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [chainId, setChainId] = useState(null);
   const [networkName, setNetworkName] = useState('Unknown');
+  const [wallets, setWallets] = useState([]);
+
+  const createReadProvider = useCallback(async (targetChainId = 1) => {
+    try {
+      const chain = Number(targetChainId) || 1;
+      const rpcByChain = {
+        1: appConfig.api?.alchemyApiKey
+          ? `https://eth-mainnet.g.alchemy.com/v2/${appConfig.api.alchemyApiKey}`
+          : appConfig.api?.infuraProjectId
+          ? `https://mainnet.infura.io/v3/${appConfig.api.infuraProjectId}`
+          : 'https://cloudflare-eth.com',
+        137: 'https://polygon-rpc.com',
+        56: 'https://bsc-dataseed.binance.org',
+      };
+      const url = rpcByChain[chain] || rpcByChain[1];
+      const read = new ethers.JsonRpcProvider(url, chain);
+      const network = await read.getNetwork();
+      setProvider(read);
+      setChainId(Number(network.chainId));
+      setNetworkName(`${getNetworkName(Number(network.chainId))} (Read-only)`);
+      return read;
+    } catch (e) {
+      console.error('Failed to create read-only provider', e);
+      return null;
+    }
+  }, []);
   const connectWallet = useCallback(async () => {
     if (!window.ethereum) {
       setError('Please install MetaMask or another Web3 wallet');
@@ -71,6 +100,7 @@ export const WalletProvider = ({ children }) => {
       const balanceInEth = ethers.formatEther(balance);
 
       setAccount(account);
+      setActiveAccount(account);
       setProvider(provider);
       setSigner(signer);
       setBalance(balanceInEth);
@@ -78,6 +108,12 @@ export const WalletProvider = ({ children }) => {
       setNetworkName(networkName);
       setIsConnected(true);
       setError(null);
+
+      // Add to managed wallets store
+      try {
+        const updated = addWalletAddress(account, 'Connected');
+        setWallets(updated);
+      } catch {}
     } catch (err) {
       console.error('Error connecting wallet:', err);
       setError(err.message || 'Failed to connect wallet');
@@ -94,11 +130,19 @@ export const WalletProvider = ({ children }) => {
           const accounts = await window.ethereum.request({ method: 'eth_accounts' });
           if (accounts.length > 0) {
             await connectWallet();
+          } else {
+            await createReadProvider(1);
           }
         } catch (err) {
           console.error('Error checking wallet connection:', err);
         }
+      } else {
+        await createReadProvider(1);
       }
+      // Load managed wallets from localStorage
+      try {
+        setWallets(loadWallets());
+      } catch {}
     };
 
     checkConnection();
@@ -132,6 +176,7 @@ export const WalletProvider = ({ children }) => {
 
   const disconnectWallet = () => {
     setAccount(null);
+    setActiveAccount(null);
     setProvider(null);
     setSigner(null);
     setBalance('0');
@@ -143,7 +188,8 @@ export const WalletProvider = ({ children }) => {
 
   const switchNetwork = async (targetChainId) => {
     if (!window.ethereum) {
-      setError('Wallet not available');
+      // For read-only, rebuild provider for target chain
+      await createReadProvider(targetChainId);
       return;
     }
     const hexId = '0x' + Number(targetChainId).toString(16);
@@ -159,6 +205,54 @@ export const WalletProvider = ({ children }) => {
     }
   };
 
+  const connectWalletConnect = useCallback(async () => {
+    setIsConnecting(true);
+    setError(null);
+    try {
+      let EthereumProvider;
+      try {
+        const mod = await import('@walletconnect/ethereum-provider');
+        EthereumProvider = mod?.default || mod?.EthereumProvider;
+      } catch (e) {
+        throw new Error('WalletConnect package not installed');
+      }
+      const wc = await EthereumProvider.init({
+        projectId: appConfig.api?.walletConnectProjectId || 'crypto-pro-portfolio-tracker',
+        showQrModal: true,
+        chains: [1],
+      });
+      await wc.connect();
+      const provider = new ethers.BrowserProvider(wc);
+      const signer = await provider.getSigner();
+      const address = await signer.getAddress();
+      const network = await provider.getNetwork();
+      const chainIdNum = Number(network.chainId);
+      const networkName = getNetworkName(chainIdNum);
+
+      const bal = await provider.getBalance(address);
+      const balanceInEth = ethers.formatEther(bal);
+
+      setAccount(address);
+      setActiveAccount(address);
+      setProvider(provider);
+      setSigner(signer);
+      setBalance(balanceInEth);
+      setChainId(chainIdNum);
+      setNetworkName(networkName);
+      setIsConnected(true);
+      setError(null);
+      try {
+        const updated = addWalletAddress(address, 'WalletConnect');
+        setWallets(updated);
+      } catch {}
+    } catch (err) {
+      console.error('WalletConnect connection error:', err);
+      setError(err?.message || 'Failed to connect via WalletConnect');
+    } finally {
+      setIsConnecting(false);
+    }
+  }, []);
+
   const refreshBalance = async () => {
     if (provider && account) {
       try {
@@ -173,6 +267,7 @@ export const WalletProvider = ({ children }) => {
 
   const value = {
     account,
+    activeAccount,
     provider,
     signer,
     balance,
@@ -182,9 +277,25 @@ export const WalletProvider = ({ children }) => {
     chainId,
     networkName,
     connectWallet,
+    connectWalletConnect,
     disconnectWallet,
     refreshBalance,
     switchNetwork,
+    wallets,
+    addManagedWallet: (address, label) => {
+      const updated = addWalletAddress(address, label);
+      setWallets(updated);
+      return updated;
+    },
+    removeManagedWallet: (address) => {
+      const updated = removeWalletAddr(address);
+      setWallets(updated);
+      if (activeAccount && activeAccount.toLowerCase() === address.toLowerCase()) {
+        setActiveAccount(account || null);
+      }
+      return updated;
+    },
+    setActiveAccount,
   };
 
   return (

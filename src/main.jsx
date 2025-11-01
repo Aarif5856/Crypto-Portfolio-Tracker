@@ -13,5 +13,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </React.StrictMode>,
 )
 
+// Global sync-all event invalidates queries
+window.addEventListener('sync-all', () => {
+  try {
+    queryClient.invalidateQueries();
+  } catch {}
+});
+
 
 

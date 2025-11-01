@@ -2,6 +2,7 @@ import React from 'react';
 import { WalletProvider } from './context/WalletContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { OnboardingProvider } from './context/OnboardingContext';
+import { BillingProvider } from './context/BillingContext';
 import EnterpriseLayout from './layout/EnterpriseLayout';
 import { RouteView, useHashRoute } from './router';
 import OnboardingTutorial from './components/OnboardingTutorial';
@@ -13,16 +14,17 @@ function App() {
   return (
     <ThemeProvider>
       <WalletProvider>
-        <OnboardingProvider>
-          <EnterpriseLayout route={route} onNavigate={navigate}>
-            <RouteView route={route} />
-            <OnboardingTutorial />
-          </EnterpriseLayout>
-        </OnboardingProvider>
+        <BillingProvider>
+          <OnboardingProvider>
+            <EnterpriseLayout route={route} onNavigate={navigate}>
+              <RouteView route={route} />
+              <OnboardingTutorial />
+            </EnterpriseLayout>
+          </OnboardingProvider>
+        </BillingProvider>
       </WalletProvider>
     </ThemeProvider>
   );
 }
 
 export default App;
-

@@ -1,10 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Crown, Zap, BarChart3, Download, Bell } from 'lucide-react';
 import { appConfig } from '../config/appConfig';
 import StripeModal from './StripeModal';
+import { useBilling } from '../context/BillingContext';
 
 const UpgradeToPro = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { cycle } = useBilling();
+  const price = useMemo(() => (cycle === 'yearly' ? '99/yr' : '9.99/mo'), [cycle]);
 
   const openModal = useCallback(() => setIsModalOpen(true), []);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
@@ -50,8 +53,8 @@ const UpgradeToPro = () => {
           <h3 className="text-xl font-bold text-white">Upgrade to Pro</h3>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-white">{appConfig.monetization.proPrice}</div>
-          <div className="text-sm text-white/90">per month</div>
+          <div className="text-2xl font-bold text-white">${price}</div>
+          <div className="text-sm text-white/90">{cycle === 'yearly' ? 'billed yearly' : 'per month'}</div>
         </div>
       </div>
 

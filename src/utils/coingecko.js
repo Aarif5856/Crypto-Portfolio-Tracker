@@ -287,3 +287,23 @@ export const getCoinMarketData = async (ids = [], vsCurrency = 'usd') => {
     throw error;
   }
 };
+
+// Get top market data with pagination and sparklines
+export const getTopMarketData = async ({ page = 1, perPage = 25, vsCurrency = 'usd' } = {}) => {
+  try {
+    const response = await coingeckoAPI.get('/coins/markets', {
+      params: {
+        vs_currency: vsCurrency,
+        order: 'market_cap_desc',
+        per_page: perPage,
+        page,
+        price_change_percentage: '24h',
+        sparkline: true,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching top market data:', error);
+    throw error;
+  }
+};

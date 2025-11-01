@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, CreditCard, Shield, Check } from 'lucide-react';
 import { appConfig } from '../config/appConfig';
+import { useBilling } from '../context/BillingContext';
 
 const StripeModal = ({ isOpen, onClose }) => {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState('monthly');
+  const { cycle, setCycle } = useBilling();
+  const [selectedPlan, setSelectedPlan] = useState(cycle || 'monthly');
+
+  useEffect(() => {
+    setSelectedPlan(cycle || 'monthly');
+  }, [cycle]);
 
   if (!isOpen) return null;
 
@@ -63,7 +69,7 @@ const StripeModal = ({ isOpen, onClose }) => {
         <div className="p-6">
           <div className="grid grid-cols-2 gap-4 mb-6">
             <button
-              onClick={() => setSelectedPlan('monthly')}
+              onClick={() => { setSelectedPlan('monthly'); setCycle('monthly'); }}
               className={`p-4 rounded-lg border-2 transition-all duration-200 ${
                 selectedPlan === 'monthly'
                   ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
@@ -81,7 +87,7 @@ const StripeModal = ({ isOpen, onClose }) => {
             </button>
             
             <button
-              onClick={() => setSelectedPlan('yearly')}
+              onClick={() => { setSelectedPlan('yearly'); setCycle('yearly'); }}
               className={`p-4 rounded-lg border-2 transition-all duration-200 relative ${
                 selectedPlan === 'yearly'
                   ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'

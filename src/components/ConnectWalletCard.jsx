@@ -21,7 +21,7 @@ const ConnectWalletCard = () => {
         Connect Your Wallet
       </h2>
       <p className="text-gray-600 dark:text-gray-300 mb-6 text-lg">
-        Connect MetaMask to view your portfolio overview and unlock advanced features.
+        Connect MetaMask or WalletConnect to view your portfolio and unlock advanced features.
       </p>
       <button
         onClick={() => setShowWalletModal(true)}
@@ -32,7 +32,7 @@ const ConnectWalletCard = () => {
         <ArrowRight className="w-4 h-4" />
       </button>
       <div className="mt-6 space-y-2 text-sm text-gray-500 dark:text-gray-400">
-        <p>Supported today: MetaMask (more wallets coming soon).</p>
+        <p>Supported today: MetaMask and WalletConnect.</p>
         {error && (
           <p className="text-sm text-red-500">{error}</p>
         )}

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from '../components/Card';
+import { useBilling } from '../context/BillingContext';
 
 const TIERS = [
   {
@@ -30,14 +31,16 @@ const TIERS = [
 ];
 
 const Pricing = () => {
-  const [mode, setMode] = useState('monthly');
+  const { cycle, setCycle } = useBilling();
+  const [mode, setMode] = useState(cycle);
+  useEffect(() => setMode(cycle), [cycle]);
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="text-primary text-xl font-semibold">Pricing</div>
         <div className="flex items-center gap-2 text-sm">
-          <button onClick={() => setMode('monthly')} className={`badge ${mode === 'monthly' ? 'text-white' : ''}`}>Monthly</button>
-          <button onClick={() => setMode('yearly')} className={`badge ${mode === 'yearly' ? 'text-white' : ''}`}>Yearly</button>
+          <button onClick={() => { setMode('monthly'); setCycle('monthly'); }} className={`badge ${mode === 'monthly' ? 'text-white' : ''}`}>Monthly</button>
+          <button onClick={() => { setMode('yearly'); setCycle('yearly'); }} className={`badge ${mode === 'yearly' ? 'text-white' : ''}`}>Yearly</button>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
@@ -65,4 +68,3 @@ const Pricing = () => {
 };
 
 export default Pricing;
-

@@ -3,7 +3,7 @@ import { X, Wallet, ExternalLink } from 'lucide-react';
 import { useWallet } from '../context/WalletContext';
 
 const WalletConnectModal = ({ isOpen, onClose }) => {
-  const { connectWallet, isConnecting, error, isConnected } = useWallet();
+  const { connectWallet, connectWalletConnect, isConnecting, error, isConnected } = useWallet();
 
   useEffect(() => {
     if (isOpen && isConnected) {
@@ -11,9 +11,8 @@ const WalletConnectModal = ({ isOpen, onClose }) => {
     }
   }, [isConnected, isOpen, onClose]);
 
-  const handleConnect = async () => {
-    await connectWallet();
-  };
+  const handleConnect = async () => { await connectWallet(); };
+  const handleWalletConnect = async () => { await connectWalletConnect(); };
 
   if (!isOpen) return null;
 
@@ -40,7 +39,6 @@ const WalletConnectModal = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Restrict to MetaMask until multi-wallet support is ready */}
         <div className="space-y-4 p-6">
           <button
             onClick={handleConnect}
@@ -67,10 +65,32 @@ const WalletConnectModal = ({ isOpen, onClose }) => {
             </div>
           </button>
 
-          <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-800/60 dark:text-gray-300">
-            WalletConnect, Coinbase Wallet, Rainbow, and other connectors are coming soon. Follow our Discord for
-            updates.
-          </div>
+          <button
+            onClick={handleWalletConnect}
+            disabled={isConnecting}
+            className="flex w-full items-center justify-between rounded-xl border border-purple-200 bg-purple-50 px-4 py-4 text-left text-purple-700 transition-all duration-200 hover:border-purple-400 hover:bg-purple-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-purple-900 dark:bg-purple-900/30 dark:text-purple-200 dark:hover:border-purple-600"
+          >
+            <div className="flex items-center space-x-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-purple-600 shadow-sm dark:bg-purple-900/40">
+                <Wallet className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="font-semibold">WalletConnect</div>
+                <div className="text-sm text-purple-600/80 dark:text-purple-200/80">
+                  Scan QR with supported wallets.
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              {isConnecting ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-purple-500 border-t-transparent"></div>
+              ) : (
+                <ExternalLink className="h-5 w-5" />
+              )}
+            </div>
+          </button>
+
+          
 
           {error && (
             <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/30 dark:text-red-300">

@@ -59,6 +59,7 @@ export const appConfig = {
     coingeckoApiKey: "", // Optional: Add for higher rate limits
     infuraProjectId: "", // Optional: Add for better reliability
     alchemyApiKey: "", // Optional: Add for better reliability
+    walletConnectProjectId: "", // Optional: Enable WalletConnect QR
   },
   
   // Social Links

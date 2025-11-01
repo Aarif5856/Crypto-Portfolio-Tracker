@@ -7,8 +7,10 @@ import PortfolioRiskScore from '../components/PortfolioRiskScore';
 import Watchlist from '../components/Watchlist';
 import ConnectWalletCard from '../components/ConnectWalletCard';
 import { useWallet } from '../context/WalletContext';
+import { formatCurrency as fmt } from '../lib/utils';
 import { useOnboarding } from '../context/OnboardingContext';
 import { usePortfolioData } from '../hooks/usePortfolioData';
+import { useAggregatedPortfolio } from '../hooks/useAggregatedPortfolio';
 
 const Stat = ({ label, value, tone = 'default' }) => (
   <Card className="p-4">
@@ -18,9 +20,12 @@ const Stat = ({ label, value, tone = 'default' }) => (
 );
 
 const Dashboard = () => {
-  const { isConnected } = useWallet();
+  const { isConnected, wallets, activeAccount } = useWallet();
   const { hasSeenTutorial, startTutorial } = useOnboarding();
-  const portfolioQuery = usePortfolioData();
+  const singlePortfolioQuery = usePortfolioData();
+  const aggregatedPortfolioQuery = useAggregatedPortfolio();
+  const hasManaged = (wallets?.length || 0) > 0;
+  const portfolioQuery = hasManaged ? aggregatedPortfolioQuery : singlePortfolioQuery;
 
   useEffect(() => {
     if (!hasSeenTutorial) {
@@ -38,6 +43,21 @@ const Dashboard = () => {
         <Stat label="Risk Score" value="—/100" />
         <Stat label="Active Tokens" value="—" />
       </div>
+
+      {/* Per-wallet breakdown */}
+      {aggregatedPortfolioQuery?.data?.breakdown?.length > 0 && (
+        <div className="space-y-2">
+          <div className="text-secondary text-sm">Wallet Breakdown</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {aggregatedPortfolioQuery.data.breakdown.map((w) => (
+              <Card key={w.address} className={`p-4 ${activeAccount && activeAccount.toLowerCase()===w.address.toLowerCase() ? 'ring-1 ring-orange-500/40' : ''}`}>
+                <div className="text-xs text-secondary truncate">{w.address}</div>
+                <div className="mt-1 text-lg font-semibold text-primary">{fmt(w.totalValueUSD)}</div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Connect Wallet prompt */}
       {!isConnected && <ConnectWalletCard />}

@@ -10,6 +10,7 @@ import {
   ArrowLeftRight,
   Compass,
   Settings,
+  Crown,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -21,6 +22,7 @@ const NAV_ITEMS = [
   { key: 'transactions', label: 'Transactions', icon: ReceiptText },
   { key: 'swap', label: 'Swap', icon: ArrowLeftRight },
   { key: 'market', label: 'Discover', icon: Compass },
+  { key: 'pricing', label: 'Pricing', icon: Crown },
   { key: 'settings', label: 'Settings', icon: Settings },
 ];
 
@@ -116,4 +118,3 @@ const Sidebar = ({ route, onNavigate }) => {
 };
 
 export default Sidebar;
-
