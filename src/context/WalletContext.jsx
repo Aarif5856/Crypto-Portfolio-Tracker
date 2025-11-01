@@ -210,8 +210,9 @@ export const WalletProvider = ({ children }) => {
     setError(null);
     try {
       // Lazy import without bundler resolution to keep dependency optional
-      const pkg = '@walletconnect/ethereum-provider';
-      const mod = await import(/* @vite-ignore */ pkg).catch(() => null);
+      // Use runtime dynamic import to avoid bundler resolution during build
+      const load = (s) => (new Function('s', 'return import(s)'))(s);
+      const mod = await load('@walletconnect/ethereum-provider').catch(() => null);
       const EthereumProvider = mod?.default || mod?.EthereumProvider;
       if (!EthereumProvider) {
         throw new Error('WalletConnect not available in this build');
