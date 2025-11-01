@@ -23,5 +23,8 @@
     "compose:down": "docker compose down",
     "compose:ps": "docker compose ps",
     "compose:logs": "docker compose logs -f"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0"
   }
 }
