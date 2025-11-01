@@ -1,5 +1,16 @@
-/* Dynamic theme CSS generated from appConfig */
+/* Enterprise theme variables + dynamic primary from appConfig */
 :root {
+  /* Enterprise palette */
+  --bg: #0D0D0D;
+  --card: #121212;
+  --accent: #FF7A00; /* Primary CTA */
+  --secondary: #A259FF;
+  --success: #00C46C;
+  --error: #FF3B3B;
+  --text-primary: #FFFFFF;
+  --text-secondary: #9CA3AF;
+
+  /* Primary scale (overridden by appConfig at runtime) */
   --primary-50: 16 185 129;
   --primary-100: 16 185 129;
   --primary-200: 16 185 129;
@@ -11,4 +22,3 @@
   --primary-800: 16 185 129;
   --primary-900: 16 185 129;
 }
-

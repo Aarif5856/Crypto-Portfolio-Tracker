@@ -6,14 +6,17 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="text-center py-6 text-gray-500 dark:text-gray-400 text-sm border-t border-gray-200 dark:border-gray-700 mt-10">
+    <footer className="text-center py-6 text-secondary text-sm border-t border-white/10 mt-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
           <div className="flex items-center space-x-1">
-            {/* Clean footer copy after removing corrupted glyphs */}
-            <span>&copy; {currentYear} CryptoPro</span>
-            <span>-</span>
-            <span>Powered by Web3</span>
+            <span>&copy; {currentYear} {appConfig.appName || 'CryptoPro'}</span>
+            {appConfig.branding?.showPoweredBy !== false && (
+              <>
+                <span>-</span>
+                <span>Powered by CryptoPro</span>
+              </>
+            )}
           </div>
           <div className="flex items-center space-x-4">
             <a

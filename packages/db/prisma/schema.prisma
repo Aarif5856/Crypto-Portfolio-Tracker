@@ -1,0 +1,46 @@
+// Prisma schema for Crypto Portfolio Tracker (minimal seed)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  createdAt DateTime  @default(now())
+  accounts  Account[]
+}
+
+model Account {
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  user       User      @relation(fields: [userId], references: [id])
+  name       String
+  provider   String
+  externalId String    @unique
+  holdings   Holding[]
+  createdAt  DateTime  @default(now())
+}
+
+model Asset {
+  id     Int     @id @default(autoincrement())
+  symbol String  @unique
+  name   String
+  holdings Holding[]
+}
+
+model Holding {
+  id        Int      @id @default(autoincrement())
+  accountId Int
+  account   Account  @relation(fields: [accountId], references: [id])
+  assetId   Int
+  asset     Asset    @relation(fields: [assetId], references: [id])
+  quantity  Decimal  @db.Decimal(38, 18)
+  updatedAt DateTime @updatedAt
+}
+

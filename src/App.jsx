@@ -1,32 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { WalletProvider } from './context/WalletContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { OnboardingProvider } from './context/OnboardingContext';
-import Dashboard from './pages/Dashboard';
-import Landing from './pages/Landing';
+import EnterpriseLayout from './layout/EnterpriseLayout';
+import { RouteView, useHashRoute } from './router';
 import OnboardingTutorial from './components/OnboardingTutorial';
 import './index.css';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('landing');
-
-  const navigateToDashboard = () => setCurrentPage('dashboard');
-  const navigateToLanding = () => setCurrentPage('landing');
+  const { route, navigate } = useHashRoute('dashboard');
 
   return (
     <ThemeProvider>
       <WalletProvider>
         <OnboardingProvider>
-          <div className="App">
-            {currentPage === 'landing' ? (
-              <Landing onNavigateToDashboard={navigateToDashboard} />
-            ) : (
-              <>
-                <Dashboard onNavigateToLanding={navigateToLanding} />
-                <OnboardingTutorial />
-              </>
-            )}
-          </div>
+          <EnterpriseLayout route={route} onNavigate={navigate}>
+            <RouteView route={route} />
+            <OnboardingTutorial />
+          </EnterpriseLayout>
         </OnboardingProvider>
       </WalletProvider>
     </ThemeProvider>
@@ -34,5 +25,4 @@ function App() {
 }
 
 export default App;
-
 

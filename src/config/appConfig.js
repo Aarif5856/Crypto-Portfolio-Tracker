@@ -35,6 +35,18 @@ export const appConfig = {
     stripePublishableKey: "", // Add your Stripe key
   },
 
+  // Branding overrides and white-label controls
+  branding: {
+    showPoweredBy: true,
+    colorOverrides: {
+      // Optional runtime overrides for enterprise palette
+      // bg: "#0D0D0D",
+      // card: "#121212",
+      // accent: "#FF7A00",
+      // secondary: "#A259FF",
+    },
+  },
+
   // Analytics & CRM hooks
   analytics: {
   enableVercelAnalytics: true,
@@ -92,6 +104,10 @@ export const generateThemeCSS = () => {
       --primary-700: ${primaryRgb ? `${Math.min(255, primaryRgb.r + 40)} ${Math.min(255, primaryRgb.g + 40)} ${Math.min(255, primaryRgb.b + 40)}` : '40 234 255'};
       --primary-800: ${primaryRgb ? `${Math.min(255, primaryRgb.r + 60)} ${Math.min(255, primaryRgb.g + 60)} ${Math.min(255, primaryRgb.b + 60)}` : '60 254 255'};
       --primary-900: ${primaryRgb ? `${Math.min(255, primaryRgb.r + 80)} ${Math.min(255, primaryRgb.g + 80)} ${Math.min(255, primaryRgb.b + 80)}` : '80 255 255'};
+      ${appConfig.branding?.colorOverrides?.bg ? `--bg: ${appConfig.branding.colorOverrides.bg};` : ''}
+      ${appConfig.branding?.colorOverrides?.card ? `--card: ${appConfig.branding.colorOverrides.card};` : ''}
+      ${appConfig.branding?.colorOverrides?.accent ? `--accent: ${appConfig.branding.colorOverrides.accent};` : ''}
+      ${appConfig.branding?.colorOverrides?.secondary ? `--secondary: ${appConfig.branding.colorOverrides.secondary};` : ''}
     }
   `;
 };

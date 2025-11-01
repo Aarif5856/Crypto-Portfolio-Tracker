@@ -1,44 +1,27 @@
 {
   "name": "crypto-portfolio-tracker",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "0.1.0",
+  "packageManager": "pnpm@9",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "packages/connectors/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "check:encoding": "node scripts/check-encoding.cjs",
-    "test:e2e": "playwright test"
-  },
-  "dependencies": {
-    "@rainbow-me/rainbowkit": "^2.2.9",
-    "@tanstack/react-query": "^5.90.5",
-    "axios": "^1.6.2",
-    "chart.js": "^4.5.1",
-    "clsx": "^2.0.0",
-    "ethers": "^6.8.1",
-    "framer-motion": "^12.23.24",
-    "lucide-react": "^0.294.0",
-    "react": "^18.2.0",
-    "react-chartjs-2": "^5.3.0",
-    "react-dom": "^18.2.0",
-    "recharts": "^3.3.0",
-    "viem": "^2.38.3",
-    "wagmi": "^2.18.1"
-  },
-  "devDependencies": {
-    "@types/react": "^18.2.43",
-    "@types/react-dom": "^18.2.17",
-    "@vitejs/plugin-react": "^4.2.1",
-    "autoprefixer": "^10.4.16",
-    "@playwright/test": "^1.48.0",
-    "eslint": "^8.55.0",
-    "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.5",
-    "postcss": "^8.4.32",
-    "tailwindcss": "^3.3.6",
-    "vite": "^5.0.8"
+    "build": "pnpm -r --filter ./apps/... --filter ./packages/... run build",
+    "dev": "pnpm -r --parallel --filter ./apps/api --filter ./apps/web --filter ./apps/worker dev",
+    "start": "pnpm --filter ./apps/api start",
+    "api": "pnpm --filter ./apps/api dev",
+    "web": "pnpm --filter ./apps/web dev",
+    "worker": "pnpm --filter ./apps/worker dev",
+    "db:migrate": "pnpm --filter @cpt/db prisma:migrate",
+    "db:generate": "pnpm --filter @cpt/db prisma:generate",
+    "db:seed": "pnpm --filter @cpt/db prisma:seed",
+    "db:setup": "pnpm db:migrate && pnpm db:seed",
+    "compose:up": "docker compose up -d",
+    "compose:down": "docker compose down",
+    "compose:ps": "docker compose ps",
+    "compose:logs": "docker compose logs -f"
   }
 }

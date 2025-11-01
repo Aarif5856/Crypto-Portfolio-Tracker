@@ -8,21 +8,19 @@
 /* Base styles */
 @layer base {
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   }
   
   body {
-    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200;
+    background-color: var(--bg);
+    color: var(--text-primary);
+    @apply transition-colors duration-200;
   }
   
   /* Enhanced text colors for light mode */
-  .text-primary {
-    @apply text-gray-900 dark:text-gray-100;
-  }
+  .text-primary { color: var(--text-primary); }
   
-  .text-secondary {
-    @apply text-gray-500 dark:text-gray-400;
-  }
+  .text-secondary { color: var(--text-secondary); }
   
   /* Force better contrast for light mode */
   .light-mode-override {
@@ -42,17 +40,34 @@
 /* Custom components */
 @layer components {
   .btn-primary {
-    @apply bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+    @apply text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    background-color: var(--accent);
+    box-shadow: 0 0 0 0 rgba(0,0,0,0);
   }
+  .btn-primary:hover { filter: brightness(1.05); }
+  .btn-primary:focus { outline: none; box-shadow: 0 0 0 3px rgba(255,122,0,0.35); }
   
   .btn-secondary {
     @apply bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
   }
-  
-  .card {
-    @apply bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700 p-6;
+
+  .btn-gradient {
+    @apply text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply bg-gradient-to-r from-orange-400 to-purple-500;
   }
   
+  .card {
+    @apply rounded-2xl transition-all duration-300 p-6 border;
+    background-color: var(--card);
+    border-color: rgba(255,255,255,0.06);
+  }
+
+  .card-glass {
+    @apply rounded-2xl transition-all duration-300 p-6 border backdrop-blur;
+    @apply bg-gradient-to-br from-[#1A1A1A] to-[#121212];
+    border-color: rgba(255,255,255,0.06);
+  }
+
   .input {
     @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
   }
@@ -63,6 +78,12 @@
   
   .text-gradient {
     @apply bg-gradient-to-r from-primary-500 to-primary-700 bg-clip-text text-transparent;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
+    background-color: rgba(255,255,255,0.06);
+    color: var(--text-secondary);
   }
 }
 
