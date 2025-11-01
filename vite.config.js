@@ -15,7 +15,7 @@ export default defineConfig({
         manualChunks: {
           // Split vendor libraries into separate chunks
           vendor: ['react', 'react-dom'],
-          wallet: ['@rainbow-me/rainbowkit', 'wagmi', 'viem', 'ethers'],
+          // wallet chunk removed to avoid resolving optional packages during build
           ui: ['lucide-react', 'recharts', 'framer-motion'],
           utils: ['axios', 'clsx']
         }
