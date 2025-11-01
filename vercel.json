@@ -1,9 +1,9 @@
 {
+  "installCommand": "corepack enable || true && corepack prepare pnpm@9 --activate || true && pnpm install --no-frozen-lockfile",
+  "buildCommand": "pnpm run build:root",
+  "outputDirectory": "dist",
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
 
