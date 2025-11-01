@@ -209,12 +209,12 @@ export const WalletProvider = ({ children }) => {
     setIsConnecting(true);
     setError(null);
     try {
-      let EthereumProvider;
-      try {
-        const mod = await import('@walletconnect/ethereum-provider');
-        EthereumProvider = mod?.default || mod?.EthereumProvider;
-      } catch (e) {
-        throw new Error('WalletConnect package not installed');
+      // Lazy import without bundler resolution to keep dependency optional
+      const pkg = '@walletconnect/ethereum-provider';
+      const mod = await import(/* @vite-ignore */ pkg).catch(() => null);
+      const EthereumProvider = mod?.default || mod?.EthereumProvider;
+      if (!EthereumProvider) {
+        throw new Error('WalletConnect not available in this build');
       }
       const wc = await EthereumProvider.init({
         projectId: appConfig.api?.walletConnectProjectId || 'crypto-pro-portfolio-tracker',
