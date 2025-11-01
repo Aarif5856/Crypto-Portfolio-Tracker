@@ -76,4 +76,4 @@ jobs:
           pnpm run build:root
 
       - name: Run Playwright tests
-        run: pnpm exec playwright test
+        run: pnpm exec playwright test -c ./playwright.config.js
