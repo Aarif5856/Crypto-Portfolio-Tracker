@@ -33,7 +33,8 @@ export default defineConfig({
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {
-        command: 'npm run dev -- --host 127.0.0.1 --port 4173',
+        // Serve the built UI only; avoids starting API/worker during UI tests
+        command: 'pnpm run preview:ui',
         reuseExistingServer: !process.env.CI,
         stdout: 'pipe',
         stderr: 'pipe',
